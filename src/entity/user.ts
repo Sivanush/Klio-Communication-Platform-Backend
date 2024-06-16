@@ -10,3 +10,8 @@ export class User {
     ) { }
 }
 
+export interface DecodedData {
+    email: string;
+    otp:string
+  }
+

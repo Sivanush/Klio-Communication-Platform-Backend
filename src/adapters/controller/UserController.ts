@@ -20,12 +20,15 @@ export class UserController {
                 return;
             }
             const userEntity = <User>{ username, email, password }
-            const user = await this.userUseCase.executeSignup(userEntity)
-            res.status(201).json(user)
+            const result = await this.userUseCase.executeSignup(userEntity)
+            res.status(201).json(result)
 
         } catch (err) {
-
-            res.status(400).json({ message: "Internal Server Error" });
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(400).json({ message: "Internal Server Error" });
+            }
         }
     }
 
@@ -43,7 +46,47 @@ export class UserController {
 
             res.status(200).json({ token });
         } catch (err) {
-            res.status(400).json({ message: "Internal Server Error" });
+            if (err instanceof Error) {
+                res.status(400).json({ message: err.message });
+            } else {
+                res.status(400).json({ message: "Internal Server Error" });
+            }
+
         }
+    }
+
+
+
+    async otpVerification(req: Request, res: Response) {
+        try {
+
+            const { otp, otpToken } = req.body
+            
+            if (!otpToken) {
+                res.status(400).json({ message: 'OTP token is missing. Please try signing up again.' })
+                return;
+            } else if (!otp) {
+                res.status(400).json({ message: 'OTP is missing. Please try again.' })
+                return;
+            }
+
+            const result = await this.userUseCase.executeOtpVerification(otp,otpToken)
+            res.status(200).json({message:'OTP Verification Successfully',result})
+
+        } catch (err) {
+
+            if (err instanceof Error) {
+
+                res.status(400).json({ message: err.message })
+            } else {
+
+                res.status(400).json({ message: 'Internal Server Error' })
+            }
+        }
+    }
+
+    async googleAuth(){
+          console.log('google Auth working');
+            
     }
 }

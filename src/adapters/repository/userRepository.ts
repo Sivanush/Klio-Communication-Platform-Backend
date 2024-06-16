@@ -13,4 +13,8 @@ export class UserRepository {
         
         return await userModel.findOne({email:email})
     }
+
+    async userVerifying(email:string){
+         await userModel.updateOne({email:email},{$set:{isVerified:true}})
+    }
 }

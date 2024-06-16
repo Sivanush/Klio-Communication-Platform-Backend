@@ -13,3 +13,5 @@ const auth = new UserAuth()
 
 userRouter.post('/signup',userController.signUp.bind(userController))
 userRouter.post('/login',userController.login.bind(userController))
+userRouter.post('/otp',userController.otpVerification.bind(userController))
+userRouter.post('/googleAuth',userController.googleAuth.bind(userController))

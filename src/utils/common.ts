@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
 
-function generateOtp() {
-    return crypto.randomInt(100000, 999999).toString();
+export function generateOtp() {
+    return crypto.randomInt(1000, 9999).toString();
   }
