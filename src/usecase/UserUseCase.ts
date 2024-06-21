@@ -66,4 +66,31 @@ export class UserUseCase {
         }
     }
 
+
+    async executeGoogleAuth(userEntity:User){
+        const user = await this.userRepository.findUserByEmail(userEntity.email)
+
+        if(user){
+            const token = jwt.sign({userId:user._id},process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
+            return token
+        }else{  
+            
+            const hashedPassword = await bcrypt.hash(userEntity.uid as string, 10)
+
+            const userData:User = {
+                email: userEntity.email,
+                username: userEntity.displayName,
+                image: userEntity.photoURL,
+                isVerified: true,
+                password: hashedPassword,
+                isBlocked: false,
+            }
+
+            const createUser = await this.userRepository.createUser(userData)
+
+            const token = jwt.sign({ userId: createUser._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' });
+            return  token 
+        }
+    }
+
 }

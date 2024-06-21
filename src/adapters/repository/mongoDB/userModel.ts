@@ -7,6 +7,7 @@ export interface userI extends Document{
     isVerified:boolean
     image:string
     isBlocked:boolean 
+    isAdmin:boolean
 }
 
 const UserSchema = new Schema<userI>({
@@ -32,6 +33,10 @@ const UserSchema = new Schema<userI>({
         default:''
     },
     isBlocked:{
+        type:Boolean,
+        default:false
+    },
+    isAdmin:{
         type:Boolean,
         default:false
     }

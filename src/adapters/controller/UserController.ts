@@ -13,7 +13,6 @@ export class UserController {
         try {
             let { username, email, password } = req.body
 
-            console.log(username, email, password);
 
             if (!username || !email || !password) {
                 res.status(400).json({ error: "Username, email, and password are required." });
@@ -61,7 +60,7 @@ export class UserController {
         try {
 
             const { otp, otpToken } = req.body
-            
+
             if (!otpToken) {
                 res.status(400).json({ message: 'OTP token is missing. Please try signing up again.' })
                 return;
@@ -70,8 +69,8 @@ export class UserController {
                 return;
             }
 
-            const result = await this.userUseCase.executeOtpVerification(otp,otpToken)
-            res.status(200).json({message:'OTP Verification Successfully',result})
+            const result = await this.userUseCase.executeOtpVerification(otp, otpToken)
+            res.status(200).json({ message: 'OTP Verification Successfully', result })
 
         } catch (err) {
 
@@ -85,8 +84,25 @@ export class UserController {
         }
     }
 
-    async googleAuth(){
-          console.log('google Auth working');
+    async googleAuth(req: Request, res: Response) {
+        try {
+            const {uid,email,displayName,photoURL} = req.body
             
+            if (!displayName || !email || !uid || !photoURL) {
+                throw new Error("Internal Server Error. Try Again");
+            }
+
+            const userEntity = <User>{ email, uid , displayName ,photoURL}
+            const result = await this.userUseCase.executeGoogleAuth(userEntity)
+    
+            
+            res.status(201).json({ message: "Success" , token:result})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ message: err.message })
+            } else {
+                res.status(400).json({ message: 'Internal Server Error' })
+            }
+        }
     }
 }
