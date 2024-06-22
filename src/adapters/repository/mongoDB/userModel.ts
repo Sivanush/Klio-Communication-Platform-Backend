@@ -30,7 +30,7 @@ const UserSchema = new Schema<userI>({
     },
     image:{
         type:String,
-        default:''
+        default:'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'
     },
     isBlocked:{
         type:Boolean,

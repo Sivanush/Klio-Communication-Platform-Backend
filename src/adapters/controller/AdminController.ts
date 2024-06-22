@@ -31,4 +31,20 @@ export class AdminController{
             }
         }
     }
+
+
+    async getUsers(req:Request,res:Response){
+        try {
+
+            const result = await this.adminUsecase.executeGetUsers()
+
+            res.status(200).json({result})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(400).json({error:'Internal Server Error'})
+            }
+        }
+    }
 }

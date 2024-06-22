@@ -8,6 +8,7 @@ dotenv.config();
 
 export class AdminUseCase {
 
+
     constructor(private adminRepository: AdminRepository) {
         this.adminRepository = new AdminRepository()
     }
@@ -29,6 +30,12 @@ export class AdminUseCase {
         const token = jwt.sign({adminToken:userData._id},process.env.JWT_SECRET_C0DE as string,{expiresIn:'2 days'})
 
         return token
+    }
+
+    async executeGetUsers() {
+       const result = await this.adminRepository.getUsers()
+
+       return result
     }
 
 } 

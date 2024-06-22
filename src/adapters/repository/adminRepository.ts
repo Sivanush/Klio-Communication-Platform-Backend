@@ -10,4 +10,9 @@ export class AdminRepository{
         
         return await userModel.findOne({email:email})
     }
+
+
+    async getUsers(){
+        return await userModel.find();
+    }
 }

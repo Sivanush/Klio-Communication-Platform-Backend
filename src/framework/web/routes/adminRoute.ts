@@ -11,6 +11,7 @@ const adminController = new AdminController(adminRepository,adminUseCase)
 
 
 adminRoute.post('/login',adminController.login.bind(adminController))
+adminRoute.get('/getUsers',adminController.getUsers.bind(adminController))
 
 
 
