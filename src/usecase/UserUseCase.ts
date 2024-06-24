@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { DecodedData, User } from "../entity/user";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { generateOtp } from "../utils/common";
+import { generateOtp, generateResetToken } from "../utils/common";
 import { MailerService } from "../adapters/services/mailerService";
 dotenv.config();
 
@@ -92,5 +92,48 @@ export class UserUseCase {
             return  token 
         }
     }
+
+
+    async executeForgetPassword(email:string){
+        const userData = await this.userRepository.findUserByEmail(email)
+
+        if (!userData) {
+            throw new Error("User Not Found, Try Again");
+        }
+
+        const resetToken = generateResetToken()
+        userData.resetToken = resetToken
+        userData.resetTokenExpire = Date.now() + 600 
+
+        const userToUpdate = userData as User;
+
+        await this.userRepository.updateUser(userToUpdate);
+
+
+        await mailerService.sendEmailForToken(email,resetToken)
+    }
+
+
+
+    async executeResetPassword(token:string,newPassword:string){
+        const userData = await this.userRepository.findUserByToken(token)
+
+        if (!userData) {
+            throw new Error("Something Went Wrong, Try Again");            
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword,10)
+
+        userData.password = hashedPassword
+        userData.resetToken = undefined
+        userData.resetTokenExpire= undefined
+
+        const userToUpdate = userData as User
+        await this.userRepository.updateUser(userToUpdate)
+    }
+
+
+
+
 
 }

@@ -8,6 +8,8 @@ export interface userI extends Document{
     image:string
     isBlocked:boolean 
     isAdmin:boolean
+    resetToken:string|undefined,
+    resetTokenExpire:number|undefined
 }
 
 const UserSchema = new Schema<userI>({
@@ -39,6 +41,12 @@ const UserSchema = new Schema<userI>({
     isAdmin:{
         type:Boolean,
         default:false
+    },
+    resetToken: { 
+        type: String 
+    },
+    resetTokenExpire: { 
+        type: Number 
     }
 })
 

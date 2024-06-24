@@ -11,6 +11,10 @@ export class User {
         public photoURL?: string,
         public displayName?: string, 
         public uid?: string |Buffer,
+        public resetToken?:string|undefined,
+        public resetTokenExpire?:number|undefined,
+
+
     ) { }
 }
 

@@ -105,4 +105,52 @@ export class UserController {
             }
         }
     }
+
+
+    async forgetPassword(req:Request,res:Response){
+        try {
+            const {email} = req.body
+
+            if (!email) {
+                res.status(400).json({error:'Something Went Wrong, Try Again'})
+                return 
+            }
+            await this.userUseCase.executeForgetPassword(email)
+
+            res.status(200).json({ message: 'Password reset link sent to your email successfully' })
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+                
+            }
+        }
+    }
+
+
+
+
+    async resetPassword(req:Request,res:Response){
+        try {
+            
+            const { token , newPassword } = req.body
+
+            if (!token || !newPassword) {
+                res.status(400).json({error:'Something Went Wrong, Try Again'})
+            }
+
+            await this.userUseCase.executeResetPassword(token,newPassword)
+ 
+            res.status(200).json({ message: 'Password reset successfully' });
+
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+                
+            }
+        }
+    }
 }

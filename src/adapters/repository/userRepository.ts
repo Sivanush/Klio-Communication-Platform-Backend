@@ -17,4 +17,13 @@ export class UserRepository {
     async userVerifying(email:string){
          await userModel.updateOne({email:email},{$set:{isVerified:true}})
     }
+
+    async updateUser(userData:User) {
+        
+        return await userModel.findByIdAndUpdate(userData._id, userData);
+     }
+
+     async findUserByToken(token:string){
+        return await userModel.findOne({resetToken:token,resetTokenExpire:{$gt: Date.now() }})
+     }
 }

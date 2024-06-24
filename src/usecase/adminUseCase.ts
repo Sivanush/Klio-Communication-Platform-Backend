@@ -18,7 +18,7 @@ export class AdminUseCase {
     async executeLogin(adminData: User) {
         const userData = await this.adminRepository.findAdminUser(adminData.email)
 
-        if (!userData || !await bcrypt.compare(adminData.password,userData.password)) {
+        if (!userData || !await bcrypt.compare(adminData.password, userData.password)) {
             throw new Error("Invalid Credentials");
         }
 
@@ -26,16 +26,29 @@ export class AdminUseCase {
             throw new Error("Access Denied");
         }
 
-        
-        const token = jwt.sign({adminToken:userData._id},process.env.JWT_SECRET_C0DE as string,{expiresIn:'2 days'})
+
+        const token = jwt.sign({ adminToken: userData._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
 
         return token
     }
 
     async executeGetUsers() {
-       const result = await this.adminRepository.getUsers()
+        const result = await this.adminRepository.getUsers()
 
-       return result
+        return result
+    }
+
+    async executeToggleUserBlock(userId: string) {
+
+        const userData = await this.adminRepository.findUserById(userId)
+        if (!userData) {
+            throw new Error("User Not Found, Try Again");
+
+        }
+        
+        userData.isBlocked = !userData.isBlocked
+
+        await this.adminRepository.updateUser(userData)
     }
 
 } 

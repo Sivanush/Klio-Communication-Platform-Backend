@@ -47,4 +47,27 @@ export class AdminController{
             }
         }
     }
+
+    async toggleUserBlock(req:Request,res:Response){
+        try {
+            
+            const { userId } = req.params
+            
+            if (!userId) {
+                res.status(400).json({error:'User Id Not Found, Try Again'})
+                return
+            }
+
+            await this.adminUsecase.executeToggleUserBlock(userId)
+
+            res.status(200).json({message:'Successfully User Status Changed'})
+            
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(400).json({error:'Internal Server Error'})    
+            }
+        }
+    }
 }
