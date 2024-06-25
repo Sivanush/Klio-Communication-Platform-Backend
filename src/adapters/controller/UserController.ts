@@ -110,7 +110,8 @@ export class UserController {
     async forgetPassword(req:Request,res:Response){
         try {
             const {email} = req.body
-
+     
+            
             if (!email) {
                 res.status(400).json({error:'Something Went Wrong, Try Again'})
                 return 

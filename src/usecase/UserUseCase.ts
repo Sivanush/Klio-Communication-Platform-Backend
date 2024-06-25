@@ -103,7 +103,7 @@ export class UserUseCase {
 
         const resetToken = generateResetToken()
         userData.resetToken = resetToken
-        userData.resetTokenExpire = Date.now() + 600 
+        userData.resetTokenExpire = Date.now() + 600000 
 
         const userToUpdate = userData as User;
 
@@ -117,9 +117,9 @@ export class UserUseCase {
 
     async executeResetPassword(token:string,newPassword:string){
         const userData = await this.userRepository.findUserByToken(token)
-
+        
         if (!userData) {
-            throw new Error("Something Went Wrong, Try Again");            
+            throw new Error("Invalid or expired reset token");           
         }
 
         const hashedPassword = await bcrypt.hash(newPassword,10)
