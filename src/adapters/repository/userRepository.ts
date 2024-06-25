@@ -1,5 +1,5 @@
 import { User } from "../../entity/user";
-import { userI, userModel } from "./mongoDB/userModel";
+import { userI, userModel } from "./schema/userModel";
 
 export class UserRepository {
     async createUser(userEntity:User){

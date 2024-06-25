@@ -13,6 +13,7 @@ export class User {
         public uid?: string |Buffer,
         public resetToken?:string|undefined,
         public resetTokenExpire?:number|undefined,
+        public isGoogle?:boolean
 
 
     ) { }

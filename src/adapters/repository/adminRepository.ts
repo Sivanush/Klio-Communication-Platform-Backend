@@ -1,4 +1,4 @@
-import { userModel } from "./mongoDB/userModel";
+import { userModel } from "./schema/userModel";
 
 
 export class AdminRepository{

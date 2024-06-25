@@ -16,7 +16,7 @@ export class UserUseCase {
         
         const existUser = await this.userRepository.findUserByEmail(userEntity.email)
 
-        if (existUser) {
+        if (existUser && existUser.isVerified === true) {
             throw new Error('User Already Exist')
         }
 
@@ -24,7 +24,6 @@ export class UserUseCase {
         userEntity.password = hashedPassword
 
         const createUser = await this.userRepository.createUser(userEntity)
-        // return createUser
 
         const otp = generateOtp()
         console.log('OTP is Generated: '+otp);
@@ -41,6 +40,10 @@ export class UserUseCase {
     async executeLogin(userEntity:User){
 
         const user = await this.userRepository.findUserByEmail(userEntity.email) 
+
+        if(user?.isGoogle === true){
+            throw new Error('Account linked to Google. Please sign in with Google to continue.')
+        }
 
         if (!user || !await bcrypt.compare(userEntity.password, user.password)) {
             throw new Error('Invalid credentials');
@@ -84,6 +87,7 @@ export class UserUseCase {
                 isVerified: true,
                 password: hashedPassword,
                 isBlocked: false,
+                isGoogle:true
             }
 
             const createUser = await this.userRepository.createUser(userData)

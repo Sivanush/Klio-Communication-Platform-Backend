@@ -9,7 +9,8 @@ export interface userI extends Document{
     isBlocked:boolean 
     isAdmin:boolean
     resetToken:string|undefined,
-    resetTokenExpire:number|undefined
+    resetTokenExpire:number|undefined,
+    isGoogle:boolean
 }
 
 const UserSchema = new Schema<userI>({
@@ -47,6 +48,10 @@ const UserSchema = new Schema<userI>({
     },
     resetTokenExpire: { 
         type: Number 
+    },
+    isGoogle:{
+        type:Boolean,
+        default:false
     }
 })
 
