@@ -13,7 +13,7 @@ export interface userI extends Document{
     isGoogle:boolean
 }
 
-const UserSchema = new Schema<userI>({
+const userSchema = new Schema<userI>({
     username:{
         type:String,
         required:true
@@ -55,4 +55,4 @@ const UserSchema = new Schema<userI>({
     }
 })
 
-export const userModel = model<userI>('User',UserSchema)
+export const userModel = model<userI>('User',userSchema)

@@ -26,4 +26,8 @@ export class UserRepository {
      async findUserByToken(token:string){
         return await userModel.findOne({resetToken:token,resetTokenExpire:{$gt: Date.now() }})
      }
+
+     async findUsers(query:string){
+        return await userModel.find({username: new RegExp(query,'i')}).select('username email image')
+     }
 }

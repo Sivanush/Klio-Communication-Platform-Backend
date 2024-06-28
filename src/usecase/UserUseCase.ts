@@ -138,6 +138,9 @@ export class UserUseCase {
 
 
 
-
+    async executeSearchUsers(query:string){
+        const users = await this.userRepository.findUsers(query)
+        return users
+    }
 
 }

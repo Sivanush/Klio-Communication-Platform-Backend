@@ -154,4 +154,31 @@ export class UserController {
             }
         }
     }
+
+
+
+
+
+    async searchUsers(req:Request,res:Response){
+        try {
+            
+            // console.log(req.query);
+
+            if(!req.query.query){
+                res.status(400).json({error:'Something Went Wrong, Try Again'})
+            }
+            const users = await this.userUseCase.executeSearchUsers(req.query.query as string)
+
+            res.status(200).json({users:users})
+            
+
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(400).json({error:'Internal Server Error'})
+                
+            }
+        }
+    }
 }
