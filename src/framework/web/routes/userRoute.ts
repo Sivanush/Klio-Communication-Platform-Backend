@@ -17,4 +17,9 @@ userRouter.post('/otp',userController.otpVerification.bind(userController))
 userRouter.post('/googleAuth',userController.googleAuth.bind(userController))
 userRouter.post('/forget-password',userController.forgetPassword.bind(userController))
 userRouter.post('/reset-password',userController.resetPassword.bind(userController))
-userRouter.get('/search-users',userController.searchUsers.bind(userController))  
+userRouter.get('/search-users',auth.authMiddleware,userController.searchUsers.bind(userController))  
+
+
+userRouter.post('/send-request',auth.authMiddleware,userController.sendRequest.bind(userController))  
+userRouter.get('/pending-request',auth.authMiddleware,userController.listPendingRequest.bind(userController))  
+userRouter.post('/accept-request',auth.authMiddleware,userController.acceptFriendRequest.bind(userController))  

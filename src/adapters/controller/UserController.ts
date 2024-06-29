@@ -86,17 +86,17 @@ export class UserController {
 
     async googleAuth(req: Request, res: Response) {
         try {
-            const {uid,email,displayName,photoURL} = req.body
-            
+            const { uid, email, displayName, photoURL } = req.body
+
             if (!displayName || !email || !uid || !photoURL) {
                 throw new Error("Internal Server Error. Try Again");
             }
 
-            const userEntity = <User>{ email, uid , displayName ,photoURL}
+            const userEntity = <User>{ email, uid, displayName, photoURL }
             const result = await this.userUseCase.executeGoogleAuth(userEntity)
-    
-            
-            res.status(201).json({ message: "Success" , token:result})
+
+
+            res.status(201).json({ message: "Success", token: result })
         } catch (err) {
             if (err instanceof Error) {
                 res.status(400).json({ message: err.message })
@@ -107,24 +107,24 @@ export class UserController {
     }
 
 
-    async forgetPassword(req:Request,res:Response){
+    async forgetPassword(req: Request, res: Response) {
         try {
-            const {email} = req.body
-     
-            
+            const { email } = req.body
+
+
             if (!email) {
-                res.status(400).json({error:'Something Went Wrong, Try Again'})
-                return 
+                res.status(400).json({ error: 'Something Went Wrong, Try Again' })
+                return
             }
             await this.userUseCase.executeForgetPassword(email)
 
             res.status(200).json({ message: 'Password reset link sent to your email successfully' })
         } catch (err) {
             if (err instanceof Error) {
-                res.status(400).json({error:err.message})
+                res.status(400).json({ error: err.message })
             } else {
-                res.status(500).json({error:'Internal Server Error'})
-                
+                res.status(500).json({ error: 'Internal Server Error' })
+
             }
         }
     }
@@ -132,25 +132,25 @@ export class UserController {
 
 
 
-    async resetPassword(req:Request,res:Response){
+    async resetPassword(req: Request, res: Response) {
         try {
-            
-            const { token , newPassword } = req.body
+
+            const { token, newPassword } = req.body
 
             if (!token || !newPassword) {
-                res.status(400).json({error:'Something Went Wrong, Try Again'})
+                res.status(400).json({ error: 'Something Went Wrong, Try Again' })
             }
 
-            await this.userUseCase.executeResetPassword(token,newPassword)
- 
+            await this.userUseCase.executeResetPassword(token, newPassword)
+
             res.status(200).json({ message: 'Password reset successfully' });
 
         } catch (err) {
             if (err instanceof Error) {
-                res.status(400).json({error:err.message})
+                res.status(400).json({ error: err.message })
             } else {
-                res.status(500).json({error:'Internal Server Error'})
-                
+                res.status(500).json({ error: 'Internal Server Error' })
+
             }
         }
     }
@@ -159,25 +159,104 @@ export class UserController {
 
 
 
-    async searchUsers(req:Request,res:Response){
+    async searchUsers(req: Request, res: Response) {
         try {
-            
-            // console.log(req.query);
 
-            if(!req.query.query){
-                res.status(400).json({error:'Something Went Wrong, Try Again'})
+
+            if (!req.user || !req.user.userId) {
+                return res.status(401).json({ error: 'Unauthorized: No user information found' });
             }
-            const users = await this.userUseCase.executeSearchUsers(req.query.query as string)
 
-            res.status(200).json({users:users})
+            const mainUser = req.user.userId
             
+
+            if (!req.query.query || !mainUser) {
+                res.status(400).json({ error: 'Something Went Wrong, Try Again' })
+            }
+            const users = await this.userUseCase.executeSearchUsers(req.query.query as string,mainUser)
+
+            res.status(200).json({ users: users })
+
 
         } catch (err) {
             if (err instanceof Error) {
-                res.status(400).json({error:err.message})
+                res.status(400).json({ error: err.message })
             } else {
-                res.status(400).json({error:'Internal Server Error'})
-                
+                res.status(400).json({ error: 'Internal Server Error' })
+
+            }
+        }
+    }
+
+
+    async sendRequest(req: Request, res: Response) {
+        try {
+
+            const { receiverId } = req.body
+
+            if (!req.user || !req.user.userId) {
+                return res.status(401).json({ error: 'Unauthorized: No user information found' });
+            }
+
+            const senderId = req.user.userId
+            console.log(senderId);
+
+
+            await this.userUseCase.executeSendRequest(receiverId, senderId)
+
+            res.status(201).json({ message: 'Friend Request Sended Successfully' })
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(400).json({ error: 'Internal Server Error' })
+            }
+        }
+    }
+
+
+    async listPendingRequest(req: Request, res: Response) {
+        try {
+
+            if (!req.user || !req.user.userId) {
+                return res.status(401).json({ error: 'Unauthorized: No user information found' });
+            }
+
+            
+            const userId = req.user.userId
+
+            const requests = await this.userUseCase.executeListPendingRequest(userId)
+
+            res.status(200).json({message:'Pending request successfully received', requests})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(400).json({ error: 'Internal Server Error' })
+            }
+        }
+    }
+
+    async acceptFriendRequest(req: Request, res: Response){
+        try {
+            
+            const { requestId } = req.body
+
+            if (!requestId) {
+                return res.status(400).json({ message: 'ISomething Went Wrong, Try Again' });
+              }
+
+            await this.userUseCase.executeAcceptFriendRequest(requestId)
+
+
+            res.status(200).json({message:'Successfully friends request Accepted '})
+
+
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(400).json({ error: 'Internal Server Error' })
             }
         }
     }

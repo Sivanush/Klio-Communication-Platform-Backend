@@ -2,6 +2,8 @@ import { UserRepository } from "../adapters/repository/userRepository";
 import bcrypt from 'bcrypt';
 import { DecodedData, User } from "../entity/user";
 import jwt from 'jsonwebtoken';
+import {ObjectId, Types} from "mongoose";
+
 import dotenv from 'dotenv';
 import { generateOtp, generateResetToken } from "../utils/common";
 import { MailerService } from "../adapters/services/mailerService";
@@ -138,9 +140,68 @@ export class UserUseCase {
 
 
 
-    async executeSearchUsers(query:string){
-        const users = await this.userRepository.findUsers(query)
+    async executeSearchUsers(query:string,mainUser:string){
+        const users = await this.userRepository.findUsers(query,mainUser)
         return users
     }
 
+
+
+    async executeSendRequest(receiverId:string,senderId:string){
+        const existRequest = await this.userRepository.findExistingFriendRequest(receiverId,senderId)
+        if (existRequest) {
+            throw new Error("Friend request already sent")
+        }
+
+        await this.userRepository.sendFriendRequest(receiverId,senderId)
+    }
+
+
+
+    async executeListPendingRequest(userId:string){
+        return await this.userRepository.findPendingRequest(userId)
+    }
+
+
+    async executeAcceptFriendRequest(requestId:string){
+        const request = await this.userRepository.findFriendRequest(requestId)
+
+        if (!request) {
+            throw new Error("Invalid friend request");
+        }
+
+        const {sender,receiver} = request
+
+
+        if (!sender || !receiver) {
+            throw new Error("Invalid sender or receiver in friend request");
+        }
+
+        // const senderId = sender.toString();
+        // const receiverId = receiver.toString();
+
+
+        // let senderFriends = await this.userRepository.getFriendsByUserId(senderId);
+        //     if (!senderFriends) {
+        //         senderFriends = await this.userRepository.createFriends(senderId, [receiverId]);
+        //     } else {
+        //         senderFriends.friends.push(receiverId);
+        //     }
+        //     await this.userRepository.updateFriends(senderFriends);
+
+
+
+        const senderId = sender
+        const receiverId = receiver
+
+        console.log(senderId,'------------');
+        console.log(receiverId,'++++++++++++');
+        
+
+        await this.userRepository.upsertFriends(senderId,receiverId)
+        await this.userRepository.upsertFriends(receiverId,senderId)
+
+        await this.userRepository.removeFriendRequest(requestId);
+
+    }
 }

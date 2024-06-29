@@ -3,11 +3,15 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
+interface JwtPayload {
+    userId: string;
+    username: string;
+}
 
 declare global {
     namespace Express {
         interface Request {
-            user?: any
+            user?: JwtPayload
         }
     }
 }
@@ -16,7 +20,7 @@ declare global {
 export class UserAuth{
     constructor() {}
 
-    async authMiddleware(req:Request,res:Response,next:NextFunction){
+     async authMiddleware(req:Request,res:Response,next:NextFunction){
         const token = req.headers['authorization']?.split(' ')[1];  
 
         if (!token) {
@@ -24,9 +28,8 @@ export class UserAuth{
         }
 
         try {
-            const decoded = jwt.verify(token,process.env.JWT_SECRET_C0DE as string)
+            const decoded = jwt.verify(token,process.env.JWT_SECRET_C0DE as string)  as JwtPayload;
             req.user = decoded;
-            console.log(req.user+'==============');
             next();
         } catch (err) {
             res.status(400).send('Invalid Token');

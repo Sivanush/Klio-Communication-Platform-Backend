@@ -1,3 +1,4 @@
+import { User } from "../../entity/user";
 import { userModel } from "./schema/userModel";
 
 
@@ -19,7 +20,7 @@ export class AdminRepository{
         return await userModel.findById(userId)
     }
 
-    async updateUser(userData:any) {
+    async updateUser(userData:User) {
        return await userModel.findByIdAndUpdate(userData._id, userData, { new: true });
     }
 }
