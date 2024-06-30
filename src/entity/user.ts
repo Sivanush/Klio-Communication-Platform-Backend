@@ -24,3 +24,10 @@ export interface DecodedData {
     otp: string
 }
 
+export interface SearchUser {
+    _id: string;
+    username: string;
+    image: string;
+    friendshipStatus?: string;
+  }
+  

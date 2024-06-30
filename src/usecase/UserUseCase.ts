@@ -2,7 +2,7 @@ import { UserRepository } from "../adapters/repository/userRepository";
 import bcrypt from 'bcrypt';
 import { DecodedData, User } from "../entity/user";
 import jwt from 'jsonwebtoken';
-import {ObjectId, Types} from "mongoose";
+import { ObjectId, Types } from "mongoose";
 
 import dotenv from 'dotenv';
 import { generateOtp, generateResetToken } from "../utils/common";
@@ -15,7 +15,7 @@ export class UserUseCase {
     constructor(private userRepository: UserRepository) { }
 
     async executeSignup(userEntity: User) {
-        
+
         const existUser = await this.userRepository.findUserByEmail(userEntity.email)
 
         if (existUser && existUser.isVerified === true) {
@@ -28,22 +28,22 @@ export class UserUseCase {
         const createUser = await this.userRepository.createUser(userEntity)
 
         const otp = generateOtp()
-        console.log('OTP is Generated: '+otp);
+        console.log('OTP is Generated: ' + otp);
 
 
-        await mailerService.sendEmail(createUser.email,otp)
+        await mailerService.sendEmail(createUser.email, otp)
 
-        const otpToken = jwt.sign({email:createUser.email,otp}, process.env.JWT_SECRET_C0DE as string ,{expiresIn:60})
+        const otpToken = jwt.sign({ email: createUser.email, otp }, process.env.JWT_SECRET_C0DE as string, { expiresIn: 60 })
 
-        return { message:'OTP is sended successfully to your email ' ,otpToken }
+        return { message: 'OTP is sended successfully to your email ', otpToken }
     }
 
 
-    async executeLogin(userEntity:User){
+    async executeLogin(userEntity: User) {
 
-        const user = await this.userRepository.findUserByEmail(userEntity.email) 
+        const user = await this.userRepository.findUserByEmail(userEntity.email)
 
-        if(user?.isGoogle === true){
+        if (user?.isGoogle === true) {
             throw new Error('Account linked to Google. Please sign in with Google to continue.')
         }
 
@@ -51,56 +51,57 @@ export class UserUseCase {
             throw new Error('Invalid credentials');
         }
 
-        const token = jwt.sign({userId:user._id}, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
 
         return token
     }
 
-    async executeOtpVerification(otp:string,otpToken:string){
+    async executeOtpVerification(otp: string, otpToken: string) {
 
-        const DecodedData = jwt.verify(otpToken,process.env.JWT_SECRET_C0DE as string) as DecodedData
+        const DecodedData = jwt.verify(otpToken, process.env.JWT_SECRET_C0DE as string) as DecodedData
 
-        const userEmail = DecodedData.email 
+        const userEmail = DecodedData.email
         const userOtp = DecodedData.otp
         console.log(typeof userOtp, typeof otp);
-        if (parseInt(userOtp) !==  parseInt(otp)) {
+        if (parseInt(userOtp) !== parseInt(otp)) {
             throw new Error('Otp is Invalid')
-        }else{
+        } else {
             this.userRepository.userVerifying(userEmail)
-            return {message:'User Verified Successfully'}
+            return { message: 'User Verified Successfully' }
         }
     }
 
 
-    async executeGoogleAuth(userEntity:User){
+    async executeGoogleAuth(userEntity: User) {
         const user = await this.userRepository.findUserByEmail(userEntity.email)
 
-        if(user){
-            const token = jwt.sign({userId:user._id},process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
+        if (user) {
+            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
             return token
-        }else{  
-            
+        } else {
+
             const hashedPassword = await bcrypt.hash(userEntity.uid as string, 10)
 
-            const userData:User = {
+            const userData: User = {
+                // _id:'',
                 email: userEntity.email,
                 username: userEntity.displayName,
                 image: userEntity.photoURL,
                 isVerified: true,
                 password: hashedPassword,
                 isBlocked: false,
-                isGoogle:true
+                isGoogle: true
             }
 
             const createUser = await this.userRepository.createUser(userData)
 
             const token = jwt.sign({ userId: createUser._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' });
-            return  token 
+            return token
         }
     }
 
 
-    async executeForgetPassword(email:string){
+    async executeForgetPassword(email: string) {
         const userData = await this.userRepository.findUserByEmail(email)
 
         if (!userData) {
@@ -109,99 +110,34 @@ export class UserUseCase {
 
         const resetToken = generateResetToken()
         userData.resetToken = resetToken
-        userData.resetTokenExpire = Date.now() + 600000 
+        userData.resetTokenExpire = Date.now() + 600000
 
         const userToUpdate = userData as User;
 
         await this.userRepository.updateUser(userToUpdate);
 
 
-        await mailerService.sendEmailForToken(email,resetToken)
+        await mailerService.sendEmailForToken(email, resetToken)
     }
 
 
 
-    async executeResetPassword(token:string,newPassword:string){
+    async executeResetPassword(token: string, newPassword: string) {
         const userData = await this.userRepository.findUserByToken(token)
-        
+
         if (!userData) {
-            throw new Error("Invalid or expired reset token");           
+            throw new Error("Invalid or expired reset token");
         }
 
-        const hashedPassword = await bcrypt.hash(newPassword,10)
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
 
         userData.password = hashedPassword
         userData.resetToken = undefined
-        userData.resetTokenExpire= undefined
+        userData.resetTokenExpire = undefined
 
         const userToUpdate = userData as User
         await this.userRepository.updateUser(userToUpdate)
     }
 
 
-
-    async executeSearchUsers(query:string,mainUser:string){
-        const users = await this.userRepository.findUsers(query,mainUser)
-        return users
-    }
-
-
-
-    async executeSendRequest(receiverId:string,senderId:string){
-        const existRequest = await this.userRepository.findExistingFriendRequest(receiverId,senderId)
-        if (existRequest) {
-            throw new Error("Friend request already sent")
-        }
-
-        await this.userRepository.sendFriendRequest(receiverId,senderId)
-    }
-
-
-
-    async executeListPendingRequest(userId:string){
-        return await this.userRepository.findPendingRequest(userId)
-    }
-
-
-    async executeAcceptFriendRequest(requestId:string){
-        const request = await this.userRepository.findFriendRequest(requestId)
-
-        if (!request) {
-            throw new Error("Invalid friend request");
-        }
-
-        const {sender,receiver} = request
-
-
-        if (!sender || !receiver) {
-            throw new Error("Invalid sender or receiver in friend request");
-        }
-
-        // const senderId = sender.toString();
-        // const receiverId = receiver.toString();
-
-
-        // let senderFriends = await this.userRepository.getFriendsByUserId(senderId);
-        //     if (!senderFriends) {
-        //         senderFriends = await this.userRepository.createFriends(senderId, [receiverId]);
-        //     } else {
-        //         senderFriends.friends.push(receiverId);
-        //     }
-        //     await this.userRepository.updateFriends(senderFriends);
-
-
-
-        const senderId = sender
-        const receiverId = receiver
-
-        console.log(senderId,'------------');
-        console.log(receiverId,'++++++++++++');
-        
-
-        await this.userRepository.upsertFriends(senderId,receiverId)
-        await this.userRepository.upsertFriends(receiverId,senderId)
-
-        await this.userRepository.removeFriendRequest(requestId);
-
-    }
 }
