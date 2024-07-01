@@ -1,18 +1,18 @@
 import mongoose, { ObjectId, model } from "mongoose";
 
 export interface directChatI extends Document{
-    sender: ObjectId;
-    receiver: ObjectId;
+    senderId: ObjectId;
+    receiverId: ObjectId;
     message: string;
     timestamp: Date;
 }
 
-const directChatSchema = new mongoose.Schema<directChatI>({
-    sender:{
+const directMessageSchema = new mongoose.Schema<directChatI>({
+    senderId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    receiver:{
+    receiverId:{
          type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
@@ -26,4 +26,4 @@ const directChatSchema = new mongoose.Schema<directChatI>({
     }
 })
 
-export const directChat = model<directChatI>('DirectChat',directChatSchema)
+export const directChatModel = model<directChatI>('Direct-Chat-Message',directMessageSchema)

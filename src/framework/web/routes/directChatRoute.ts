@@ -15,4 +15,5 @@ const auth = new UserAuth()
 
 
 directChat.post('/join-direct-chat',auth.authMiddleware,directChatController.joinDirectChat.bind(directChatController))
+directChat.post('/send-message',auth.authMiddleware,directChatController.sendMessage.bind(directChatController))
 
