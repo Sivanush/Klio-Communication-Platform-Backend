@@ -6,7 +6,7 @@ import cors from "cors";
 import { adminRoute } from './routes/adminRoute';
 import { friendsRoute } from './routes/friendsRoute';
 import { setupSocket } from '../../socket/directChatSocketService';
-import { directChat } from './routes/directChatRoute';
+// import { directChat } from './routes/directChatRoute';
 
 const app = express()
 const server = createServer(app);
@@ -17,7 +17,7 @@ connectToDb()
 
 app.use(express.json())
 app.use('/api/',userRouter)
-app.use('/api/',directChat)
+// app.use('/api/',directChat)
 app.use('/api/',friendsRoute)
 app.use('/api/admin/',adminRoute)
 

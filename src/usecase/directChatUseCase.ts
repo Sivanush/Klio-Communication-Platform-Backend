@@ -11,4 +11,8 @@ export class DirectChatUseCase{
     async executeDirectMessage(senderId:string,receiverId:string,message:string){
         return await this.directChatRepository.saveMessage(senderId,receiverId,message)
     }
+
+    async executeGetMessages(senderId:string,receiverId:string){
+        
+    }
 }
