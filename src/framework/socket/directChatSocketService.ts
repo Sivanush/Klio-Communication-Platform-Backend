@@ -1,12 +1,10 @@
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { Chat } from '../entity/directChat';
-import { DirectChatUseCase } from '../usecase/directChatUseCase';
-import { DirectChatRepository } from '../adapters/repository/directChatRepository';
+import { DirectChatRepository } from '../../adapters/repository/directChatRepository';
 
 
 const directChatRepository = new DirectChatRepository();
-const directChatUseCase = new DirectChatUseCase(directChatRepository);
+
 
 export const setupSocket = (server: HttpServer) => {
     const io = new Server(server, {
@@ -23,14 +21,21 @@ export const setupSocket = (server: HttpServer) => {
         socket.on('joinChat', ({ senderId, receiverId }) => {
             const room = [senderId, receiverId].sort().join('-')
             socket.join(room)
+
+            directChatRepository.getMessages(senderId,receiverId).then((messages)=>{
+                socket.emit('allMessages',messages)
+                
+            })
         })
 
         socket.on('sendMessage', async ({ senderId, receiverId, message }) => {
             const room = [senderId, receiverId].sort().join('-')
 
             try {
-                await directChatUseCase.executeDirectMessage(senderId, receiverId, message)
-                io.to(room).emit('message', { senderId, receiverId, message })
+                const savedMessage = await directChatRepository.sendMessage(senderId, receiverId, message)
+                const updatedMessage = await directChatRepository.getMessageById(savedMessage._id as unknown as string)
+                io.to(room).emit('message', updatedMessage)
+
             } catch (error) {
                 console.error('Error sending message:', error);
             }

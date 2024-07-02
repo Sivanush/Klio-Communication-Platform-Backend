@@ -1,6 +1,11 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { ObjectId, Schema, model } from "mongoose";
 
-const requestSchema = new Schema({
+interface requestSchemeI extends Document{
+    sender:ObjectId
+    receiver:ObjectId
+}
+
+const requestSchema = new Schema<requestSchemeI>({
     sender:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -13,4 +18,4 @@ const requestSchema = new Schema({
 })
 
 
-export const requestModel = model('Request',requestSchema)
+export const requestModel = model<requestSchemeI>('Request',requestSchema)

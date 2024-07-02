@@ -83,7 +83,6 @@ export class UserUseCase {
             const hashedPassword = await bcrypt.hash(userEntity.uid as string, 10)
 
             const userData: User = {
-                // _id:'',
                 email: userEntity.email,
                 username: userEntity.displayName,
                 image: userEntity.photoURL,

@@ -20,10 +20,9 @@ const directMessageSchema = new mongoose.Schema<directChatI>({
         type:String,
         required:true
     },
-    timestamp:{
-        type:Date,
-        default:Date.now
-    }
+    
+},{
+    timestamps:true
 })
 
 export const directChatModel = model<directChatI>('Direct-Chat-Message',directMessageSchema)

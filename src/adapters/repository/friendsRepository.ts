@@ -101,4 +101,8 @@ export class FriendsRepository{
     async getAllFriendsByUserId(userId:string){
         return await friendsModel.findOne({userId:userId}).populate('friends')
     }
+
+    async getUserImageByUserId(userId:string){
+        return await userModel.findOne({_id:userId}).select('image')
+    }
 }

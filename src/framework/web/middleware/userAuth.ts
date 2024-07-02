@@ -29,8 +29,14 @@ export class UserAuth{
 
         try {
             const decoded = jwt.verify(token,process.env.JWT_SECRET_C0DE as string)  as JwtPayload;
-            req.user = decoded;
-            next();
+            if (decoded) {           
+                console.log("User authenticated");
+                
+                 req.user = decoded;
+                next();
+            }else{
+                return res.status(401).send('Access Denied: Invalid Token Or Expired Provided!');
+            }
         } catch (err) {
             res.status(400).send('Invalid Token');
         }

@@ -7,9 +7,6 @@ export class FriendsController{
     constructor(private friendsRepository:FriendsRepository,private friendsUseCase:FriendsUseCase) {
         
     }
-
-
-
     
     async searchUsers(req: Request, res: Response) {
         try {
@@ -162,4 +159,5 @@ export class FriendsController{
             } 
         }
     }
+
 }
