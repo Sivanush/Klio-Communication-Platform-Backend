@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { UserRepository } from "../../../adapters/repository/userRepository";
 dotenv.config();
+
+const userRepository = new UserRepository()
 
 interface JwtPayload {
     userId: string;
@@ -29,6 +32,14 @@ export class UserAuth{
 
         try {
             const decoded = jwt.verify(token,process.env.JWT_SECRET_C0DE as string)  as JwtPayload;
+            if(decoded){
+                const userData = await userRepository.findUserById(decoded.userId)
+                if (userData?.isBlocked === true) {
+                    console.log("❌❌❌❌❌");
+                    
+                    return res.status(401).send('Access Denied: You Are Blocked By Admin!');
+                }
+            }
             if (decoded) {           
                 console.log("User authenticated");
                 

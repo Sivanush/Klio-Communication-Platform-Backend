@@ -20,6 +20,8 @@ export class UserUseCase {
 
         if (existUser && existUser.isVerified === true) {
             throw new Error('User Already Exist')
+        }else if(existUser && existUser.isVerified === false){
+            await this.userRepository.deleteTheUserById(existUser._id as string)
         }
 
         const hashedPassword = await bcrypt.hash(userEntity.password, 10)
@@ -33,7 +35,7 @@ export class UserUseCase {
 
         await mailerService.sendEmail(createUser.email, otp)
 
-        const otpToken = jwt.sign({ email: createUser.email, otp }, process.env.JWT_SECRET_C0DE as string, { expiresIn: 60 })
+        const otpToken = jwt.sign({ email: createUser.email, otp }, process.env.JWT_SECRET_C0DE as string, { expiresIn: "1h" })
 
         return { message: 'OTP is sended successfully to your email ', otpToken }
     }
@@ -45,6 +47,9 @@ export class UserUseCase {
 
         if (user?.isGoogle === true) {
             throw new Error('Account linked to Google. Please sign in with Google to continue.')
+        }
+        if (user?.isBlocked === true) {
+            throw new Error('Your account is blocked By The Admin')
         }
 
         if (!user || !await bcrypt.compare(userEntity.password, user.password)) {
@@ -70,12 +75,28 @@ export class UserUseCase {
             return { message: 'User Verified Successfully' }
         }
     }
+    async executeResendOtp(email:string){
+        const user = await this.userRepository.findUserByEmail(email)
+        if(!user) throw new Error('User not found')
+
+            const newOtp = generateOtp()
+            console.log('new OTP ',newOtp);
+            
+            await mailerService.sendEmail(email, newOtp)
+
+            const newOtpToken = jwt.sign({email,otp:newOtp},process.env.JWT_SECRET_C0DE as string,{expiresIn:'1h'})
+
+            return { message: 'OTP is sended successfully to your email ', newOtpToken}
+    }
 
 
     async executeGoogleAuth(userEntity: User) {
         const user = await this.userRepository.findUserByEmail(userEntity.email)
 
         if (user) {
+            if (user?.isBlocked === true) {            
+                throw new Error('Your Account Is Blocked By The Admin')
+            }
             const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_C0DE as string, { expiresIn: '2 days' })
             return token
         } else {
@@ -136,6 +157,16 @@ export class UserUseCase {
 
         const userToUpdate = userData as User
         await this.userRepository.updateUser(userToUpdate)
+    }
+
+    async executeGetUserData(userId:string){
+        return await this.userRepository.findUserById(userId)
+    }
+
+
+
+    async executeGetUserProfile(userId:string){
+        return await this.userRepository.findUserById(userId)
     }
 
 

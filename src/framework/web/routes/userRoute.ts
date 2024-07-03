@@ -18,9 +18,12 @@ const auth = new UserAuth()
 userRouter.post('/signup',userController.signUp.bind(userController))
 userRouter.post('/login',userController.login.bind(userController))
 userRouter.post('/otp',userController.otpVerification.bind(userController))
+userRouter.post('/resend-otp',userController.resendOtp.bind(userController))
 userRouter.post('/googleAuth',userController.googleAuth.bind(userController))
 userRouter.post('/forget-password',userController.forgetPassword.bind(userController))
 userRouter.post('/reset-password',userController.resetPassword.bind(userController))
+userRouter.get('/user-data',auth.authMiddleware,userController.getUserData.bind(userController))
+userRouter.get('/user/:userId',auth.authMiddleware,userController.getUserProfile.bind(userController))
 
 
 

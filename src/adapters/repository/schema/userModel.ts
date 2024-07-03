@@ -11,6 +11,7 @@ export interface userI extends Document{
     resetToken:string|undefined,
     resetTokenExpire:number|undefined,
     isGoogle:boolean
+    timestamps:Date
 }
 
 const userSchema = new Schema<userI>({
@@ -53,6 +54,8 @@ const userSchema = new Schema<userI>({
         type:Boolean,
         default:false
     }
+},{
+    timestamps:true
 })
 
 export const userModel = model<userI>('User',userSchema)

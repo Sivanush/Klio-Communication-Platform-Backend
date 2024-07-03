@@ -54,6 +54,31 @@ export class UserController {
         }
     }
 
+    async resendOtp(req: Request, res: Response){
+        try {
+            
+            const { email } = req.body
+
+            if (!email) {
+                res.status(400).json({ error: "Email is are required, Please Try Again" });
+                return;
+            }
+
+            const result = await this.userUseCase.executeResendOtp(email)
+
+            res.status(201).json(result)
+
+        } catch (err) {
+            if (err instanceof Error) {
+
+                res.status(400).json({ message: err.message })
+            } else {
+
+                res.status(400).json({ message: 'Internal Server Error' })
+            }
+        }
+    }
+
 
 
     async otpVerification(req: Request, res: Response) {
@@ -156,7 +181,43 @@ export class UserController {
     }
 
 
+    async getUserData(req: Request, res: Response){
+        try {
 
+            const userId = req.user?.userId
+            console.log(userId);
+            
+            const userData = await this.userUseCase.executeGetUserData(userId as string)
+            
+            res.json(userData)
+
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(500).json({ error: 'Internal Server Error' })
+
+            }
+        }
+    }
+
+
+    async getUserProfile(req: Request, res: Response){
+        try {
+            const {userId} = req.params
+
+            const userData = await this.userUseCase.executeGetUserProfile(userId)
+
+            res.json(userData)
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(500).json({ error: 'Internal Server Error' })
+
+            }
+        }
+    }
 
 
 }

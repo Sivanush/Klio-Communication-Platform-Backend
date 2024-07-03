@@ -15,6 +15,15 @@ export class UserRepository {
     }
 
 
+    async findUserById(id:string){
+        return await userModel.findById(id)
+    }
+
+
+    async deleteTheUserById(id:string){
+        return await userModel.findByIdAndDelete(id)
+    }
+
     async createUser(userEntity:User){
         const user = new userModel(userEntity)
         return user.save()
