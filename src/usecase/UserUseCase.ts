@@ -165,7 +165,7 @@ export class UserUseCase {
 
 
 
-    async executeGetUserProfile(userId:string){
+    async executeGetUserDataForFriend(userId:string){
         return await this.userRepository.findUserById(userId)
     }
 

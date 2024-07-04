@@ -202,11 +202,12 @@ export class UserController {
     }
 
 
-    async getUserProfile(req: Request, res: Response){
+    async getUserDataForFriend(req: Request, res: Response){
         try {
             const {userId} = req.params
 
-            const userData = await this.userUseCase.executeGetUserProfile(userId)
+            const userData = await this.userUseCase.executeGetUserDataForFriend(userId)
+            
 
             res.json(userData)
         } catch (err) {

@@ -23,7 +23,8 @@ userRouter.post('/googleAuth',userController.googleAuth.bind(userController))
 userRouter.post('/forget-password',userController.forgetPassword.bind(userController))
 userRouter.post('/reset-password',userController.resetPassword.bind(userController))
 userRouter.get('/user-data',auth.authMiddleware,userController.getUserData.bind(userController))
-userRouter.get('/user/:userId',auth.authMiddleware,userController.getUserProfile.bind(userController))
+userRouter.get('/user/:userId',auth.authMiddleware,userController.getUserDataForFriend.bind(userController))
+
 
 
 
