@@ -35,15 +35,12 @@ export class UserAuth{
             if(decoded){
                 const userData = await userRepository.findUserById(decoded.userId)
                 if (userData?.isBlocked === true) {
-                    console.log("❌❌❌❌❌");
                     
                     return res.status(401).send('Access Denied: You Are Blocked By Admin!');
                 }
             }
-            if (decoded) {           
-                console.log("User authenticated");
-                
-                 req.user = decoded;
+            if (decoded) {                     
+                req.user = decoded;
                 next();
             }else{
                 return res.status(401).send('Access Denied: Invalid Token Or Expired Provided!');
