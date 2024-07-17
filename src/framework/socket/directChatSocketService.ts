@@ -1,8 +1,10 @@
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { DirectChatRepository } from '../../adapters/repository/directChatRepository';
+import { ChannelChatRepository } from '../../adapters/repository/channelChatRepository';
 
 const directChatRepository = new DirectChatRepository();
+const channelChatRepository = new ChannelChatRepository();
 const onlineUsers = new Map();
 
 export const setupSocket = (server: HttpServer) => {
@@ -41,6 +43,33 @@ export const setupSocket = (server: HttpServer) => {
                 console.error('Error sending message:', error);
             }
         });
+
+
+
+        socket.on('joinChannel',async({userId,channelId})=>{
+            socket.join(`channel-${channelId}`)
+            const messages = await channelChatRepository.getChannelMessages(channelId)
+            socket.emit('allMessages',messages)
+        })  
+
+        socket.on('leaveChannel',({channelId})=>{
+            socket.leave(`channel-${channelId}`)
+        })  
+
+        socket.on('sendChannelMessage',async({userId,channelId,message})=>{
+            try {
+                console.log('✅✅');
+                console.log(userId);
+                
+                const savedMessage = await channelChatRepository.sendMessage(userId,channelId,message)
+                io.to(`channel-${channelId}`).emit('channelMessage',savedMessage)
+            } catch (err) {
+                console.log("Error in Channel Send Message ",err );
+                throw new Error("Something Went Wrong, Try Again");
+            }
+
+        })
+
 
         socket.on('heartbeat', (userId) => {
             if (onlineUsers.has(userId)) {

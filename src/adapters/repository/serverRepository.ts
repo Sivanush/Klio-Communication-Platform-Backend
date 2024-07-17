@@ -25,6 +25,10 @@ export class ServerRepository{
     async getAllServers(userId: string) {
         return await serverMemberModel.find({ userId }).populate('server');
     }
+    
+    async findMainChannel(serverId:string){
+        return await channelModel.findOne({ server: serverId}).sort({createdAt:1})
+    }
 
     async createCategoryInServer(name: string, serverId: string) {
         const category = new categoryModel({

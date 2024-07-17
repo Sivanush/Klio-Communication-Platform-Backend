@@ -59,19 +59,25 @@ export class ServerUseCase {
 
     async executeGetAllServers(userId:string){
         let serverMember = await this.serverRepository.getAllServers(userId)
-        
-        let servers = serverMember.map((memberShip) =>{
+     
+
+        let servers = serverMember.map(async(memberShip) =>{
             const castedMemberShip = memberShip as unknown as IServerMember
+            const channelId = await this.serverRepository.findMainChannel(castedMemberShip.server?._id as string)
+            
             return {
                 _id: castedMemberShip.server?._id,
                 name: castedMemberShip.server?.name,
                 image: castedMemberShip.server?.image,
-                role: castedMemberShip.roles
+                role: castedMemberShip.roles,
+                channelId: channelId?._id
             };
-
         })
 
-        return servers
+        const resolvedServers = await Promise.all(servers)
+        console.log(resolvedServers);
+      
+        return resolvedServers
     }
 
     async executeGetServerDetail(serverId:string){
