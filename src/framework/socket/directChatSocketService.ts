@@ -52,14 +52,25 @@ export const setupSocket = (server: HttpServer) => {
             socket.emit('allMessages',messages)
         })  
 
+
+        socket.on('getMoreMessages',async({userId,channelId,page,pageSize})=>{
+            try {
+                console.log(userId,channelId,page,pageSize);
+                
+                const messages = await channelChatRepository.getChannelMessages(channelId, page, pageSize);
+                socket.emit('paginatedMessages', messages);
+                
+              } catch (error) {
+                console.error('Error fetching paginated messages:', error);
+              }
+        })
+
         socket.on('leaveChannel',({channelId})=>{
             socket.leave(`channel-${channelId}`)
         })  
 
         socket.on('sendChannelMessage',async({userId,channelId,message})=>{
             try {
-                console.log('✅✅');
-                console.log(userId);
                 
                 const savedMessage = await channelChatRepository.sendMessage(userId,channelId,message)
                 io.to(`channel-${channelId}`).emit('channelMessage',savedMessage)
