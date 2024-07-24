@@ -40,20 +40,38 @@ export class UserRepository {
      }
 
 
-
-
-
-
-
-
-
-
-
      async findUserByToken(token:string){
         return await userModel.findOne({resetToken:token,resetTokenExpire:{$gt: Date.now() }})
      }
 
 
+     async updateUserBio(bio:string,userId:string){
+        return await userModel.findByIdAndUpdate(userId,{$set:{bio:bio}})
+     }
 
-    
+     async updateUserStatus(status:string,customStatus:string,userId:string){
+        await userModel.findByIdAndUpdate(userId,{
+            $set:{
+                status:status,
+                customStatus:customStatus
+            }
+        })        
+     }
+
+     async updateUserToOnline(userId:string){
+        await userModel.findByIdAndUpdate(userId,{
+            $set:{
+                status:'online'
+            }
+        })
+     }
+
+
+     async updateUserToOffline(userId:string){
+        await userModel.findByIdAndUpdate(userId,{
+            $set:{
+                status:'offline'
+            }
+        })
+     }
 }

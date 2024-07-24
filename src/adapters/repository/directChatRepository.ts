@@ -25,4 +25,16 @@
         async getMessageById(id:string){       
             return await directChatModel.findById(id).populate('senderId receiverId')
         }
+
+        async getUnReadMessageCount(senderId:string,receiverId:string){
+            return await directChatModel.countDocuments({senderId:senderId,receiverId:receiverId,read:false})
+        }
+
+        async markMessagesAsRead(userId:string, otherUserId:string){
+            await directChatModel.updateMany({senderId:otherUserId,receiverId:userId},{$set:{isRead:true}})
+        }
+
+        async getUnreadMessageCount(userId:string, otherUserId:string){
+            return await directChatModel.countDocuments({senderId:otherUserId,receiverId:userId,isRead:false})
+        }
     }

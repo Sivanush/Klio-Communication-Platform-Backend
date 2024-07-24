@@ -8,3 +8,7 @@ export function generateOtp() {
 export function generateResetToken ()  {
   return crypto.randomBytes(20).toString('hex');
 };
+
+export function generateInviteToken(){
+  return crypto.randomBytes(8).toString('hex');
+}

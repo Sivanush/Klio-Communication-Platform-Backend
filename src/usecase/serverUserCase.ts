@@ -6,6 +6,7 @@ import cloudinary from "../utils/cloudinary";
 import { IServerMember } from "../interfaces/serverInterface";
 import { ClientSession } from "mongoose";
 import { serverModel } from "../adapters/repository/schema/serverSchema";
+import { generateInviteToken } from "../utils/common";
 
 
 
@@ -17,8 +18,6 @@ export class ServerUseCase {
 
 
     async executeCreateServer(server: Server) {
-        console.log(server.image);
-        
         if (server.image) {
             if (Buffer.isBuffer(server.image)) {
 
@@ -40,10 +39,15 @@ export class ServerUseCase {
         }
         const session: ClientSession = await serverModel.startSession();
         session.startTransaction();
-        
-        
+
+
         try {
-            let createdServer = await this.serverRepository.createServer(server);
+            let createdServer = null
+            if (server.image) {
+                createdServer = await this.serverRepository.createServer(server);
+            }else{
+                createdServer = await this.serverRepository.createServerWithoutImage(server);
+            }
             await this.serverRepository.addServerAdmin(createdServer._id, server.owner);
             const category = await this.serverRepository.createCategoryInServer('General', createdServer._id.toString());
             await this.serverRepository.createChannelInCategory('General', 'text', createdServer._id.toString(), category._id as string);
@@ -57,14 +61,14 @@ export class ServerUseCase {
 
 
 
-    async executeGetAllServers(userId:string){
+    async executeGetAllServers(userId: string) {
         let serverMember = await this.serverRepository.getAllServers(userId)
-     
 
-        let servers = serverMember.map(async(memberShip) =>{
+
+        let servers = serverMember.map(async (memberShip) => {
             const castedMemberShip = memberShip as unknown as IServerMember
             const channelId = await this.serverRepository.findMainChannel(castedMemberShip.server?._id as string)
-            
+
             return {
                 _id: castedMemberShip.server?._id,
                 name: castedMemberShip.server?.name,
@@ -76,11 +80,13 @@ export class ServerUseCase {
 
         const resolvedServers = await Promise.all(servers)
         console.log(resolvedServers);
-      
+
         return resolvedServers
     }
 
-    async executeGetServerDetail(serverId:string){
+    async executeGetServerDetail(serverId: string) {
+        if (!serverId) throw new Error("Server ID Not Found Try Again");
+
         let serverDetail = await this.serverRepository.getServerDetailById(serverId)
 
         if (!serverDetail) throw new Error("Something Went Wrong, Try Again");
@@ -89,9 +95,9 @@ export class ServerUseCase {
 
         let channels = await this.serverRepository.getChannelDetailByServerId(serverDetail._id.toString())
 
-        const categoryWithChannels = categories.map((category)=>({
+        const categoryWithChannels = categories.map((category) => ({
             ...category,
-            channels:channels.filter(channels=> channels.category._id.toString()==category._id.toString())
+            channels: channels.filter(channels => channels.category._id.toString() == category._id.toString())
         }))
 
         categoryWithChannels.forEach((category) => {
@@ -99,11 +105,74 @@ export class ServerUseCase {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
         });
-     
-        
+
+
         return {
             ...serverDetail,
-            categories:categoryWithChannels
+            categories: categoryWithChannels
+        }
+    }
+
+
+    async executeGenerateInviteCode(serverId: string) {
+        if (!serverId) throw new Error("Server ID Not Found Try Again");
+        const inviteCode = generateInviteToken()
+        const expireDate = new Date(Date.now() + 60 * 60 * 1000)
+
+        await this.serverRepository.createNewInviteCode(serverId, inviteCode, expireDate)
+
+        return {
+            inviteCode: inviteCode,
+            expireDate: expireDate
+        }
+    }
+
+    async executeJoinServer(inviteCode: string, userId: string) {
+        if (!inviteCode) throw new Error("Invite Code Not Found Try Again");
+        if (!userId) throw new Error("User ID Not Found Try Again");
+
+        const inviteCodeDetail = await this.serverRepository.getInviteCodeDetail(inviteCode)
+
+        if (!inviteCodeDetail) throw new Error("Invite Code Not Found Try Again");
+
+        if (new Date() > inviteCodeDetail.expiredAt) {
+            throw new Error("Invite link has expired");
+        }
+
+        const userExist = await this.serverRepository.findUserExistInTheServer(userId, inviteCodeDetail.serverId)
+
+        if (userExist) throw new Error("User already exist in the server");
+        else {
+            await this.serverRepository.addServerUser(inviteCodeDetail.serverId, userId)
+
+            const channelId = await this.serverRepository.findMainChannel(inviteCodeDetail.serverId)
+
+            if (channelId) {
+                return `${inviteCodeDetail.serverId}/${channelId._id}`;
+            } else {
+                throw new Error("Something went wrong, Please try again"); 
+            }
+        }
+
+
+    }
+
+    async executeServerDetailByInvite(inviteCode: string) {
+        if (!inviteCode) throw new Error("Invite Code Not Found Try Again");
+
+        const serverDetail = await this.serverRepository.getServerDetailByInviteCode(inviteCode)
+        console.log(serverDetail);
+        
+
+        if (!serverDetail) throw new Error("Server Details Not Found Try Again");
+
+        const serverMemberCount = await this.serverRepository.getUserCountByServerId(serverDetail.serverId)
+
+        if (!serverMemberCount) throw new Error("Server Member Count Not Found Try Again");
+
+        return {
+            serverDetail,
+            serverMemberCount
         }
     }
 }

@@ -22,7 +22,7 @@ const serverSchema = new Schema<IServer>({
     },
     image:{
         type: String,
-        default:''
+        default:'https://res.cloudinary.com/dgpcd5c0d/image/upload/v1721741928/qg2ugnxxr0wsuvx82vx1.jpg'
     },
     owner:{
         type: Schema.Types.ObjectId,

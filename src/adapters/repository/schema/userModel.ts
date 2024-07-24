@@ -11,7 +11,10 @@ export interface userI extends Document{
     resetToken:string|undefined,
     resetTokenExpire:number|undefined,
     isGoogle:boolean
-    timestamps:Date
+    timestamps:Date,
+    bio:string,
+    status:string,
+    customStatus:string
 }
 
 const userSchema = new Schema<userI>({
@@ -39,6 +42,19 @@ const userSchema = new Schema<userI>({
     isBlocked:{
         type:Boolean,
         default:false
+    },
+    bio:{
+        type:String,
+        default:''
+    },
+    status:{
+        type:String,
+        enum: ['online', 'idle', 'dnd', 'invisible', 'offline'],
+        default: 'offline'
+    },
+    customStatus:{
+        type:String,
+        default:''
     },
     isAdmin:{
         type:Boolean,

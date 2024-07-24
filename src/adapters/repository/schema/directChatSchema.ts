@@ -5,6 +5,7 @@ export interface directChatI extends Document{
     receiverId: ObjectId;
     message: string;
     timestamp: Date;
+    isRead:boolean
 }
 
 const directMessageSchema = new mongoose.Schema<directChatI>({
@@ -20,6 +21,10 @@ const directMessageSchema = new mongoose.Schema<directChatI>({
         type:String,
         required:true
     },
+    isRead:{
+        type:Boolean,
+        default:false
+    }
     
 },{
     timestamps:true

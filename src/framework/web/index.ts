@@ -7,6 +7,7 @@ import { adminRoute } from './routes/adminRoute';
 import { friendsRoute } from './routes/friendsRoute';
 import { setupSocket } from '../socket/directChatSocketService';
 import { serverRouter } from './routes/serverRoute';
+import { removeOldInvites } from '../../adapters/repository/schema/inviteCodeScema';
 
 const app = express()
 const server = createServer(app);
@@ -22,6 +23,8 @@ app.use('/api/',serverRouter)
 app.use('/api/admin/',adminRoute)
 
 setupSocket(server)
+
+setInterval(removeOldInvites, 24 * 60 * 60 * 1000);
 
 server.listen(port, () => {
    console.log(`Example app listening on port ${port}!`)

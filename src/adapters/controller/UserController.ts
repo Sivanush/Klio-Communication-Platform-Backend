@@ -221,4 +221,45 @@ export class UserController {
     }
 
 
+
+    async updateBioOfUser(req: Request, res: Response){
+        try {
+            const { bio } = req.body
+            const userId = req.user?.userId
+
+            await this.userUseCase.executeUpdateBioOfUser(bio,userId as string)
+
+            res.status(200).json({message:'Success'})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(500).json({ error: 'Internal Server Error' })
+
+            }
+        }
+    }
+
+
+
+    async updateStatus(req: Request, res: Response){
+        try {
+            const {status,customStatus} = req.body
+            const userId = req.user?.userId
+
+            await this.userUseCase.executeUpdateStatus(status,customStatus,userId as string)
+
+
+
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({ error: err.message })
+            } else {
+                res.status(500).json({ error: 'Internal Server Error' })
+
+            }
+        }
+    }
+
+
 }

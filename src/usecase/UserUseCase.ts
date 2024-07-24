@@ -170,4 +170,23 @@ export class UserUseCase {
     }
 
 
+    async executeUpdateBioOfUser(bio:string,userId:string){
+        if (!bio) {
+            throw new Error("Please Provide the About Me");
+        }else if(!userId){
+            throw new Error("Something went wrong, Please try again");
+        }
+        await this.userRepository.updateUserBio(bio,userId)
+    }
+
+    executeUpdateStatus(status:string,customStatus:string,userId:string){
+        if (!status) {
+            throw new Error("Status is not provided");
+        }else if(!customStatus){
+            throw new Error("Custom Status is not provided");
+        }else if(!userId){
+            throw new Error("Something went wrong, Please try again");
+        }
+        return this.userRepository.updateUserStatus(status,customStatus,userId)
+    }
 }
