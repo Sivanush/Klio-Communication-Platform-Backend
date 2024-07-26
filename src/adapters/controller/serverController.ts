@@ -119,4 +119,51 @@ export class ServerController{
             } 
         }
     }
+
+    async createCategory(req:Request,res:Response){
+        try {
+            const {name,serverId} = req.body
+            
+            
+            const category = await this.serverUseCase.executeCreateCategory(name,serverId)
+
+            res.status(201).json({message:"Success",category})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+            } 
+        }
+    }
+
+    async getCategoryUnderServer(req:Request,res:Response){
+        try {
+            const {serverId} = req.params
+
+            const categories = await this.serverUseCase.executeGetCategoryUnderServer(serverId)
+
+            res.status(200).json({message:'Success',categories})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+            } 
+        }
+    }
+
+    async createChannel(req:Request,res:Response){
+        try {
+            const {name,type,categoryId} = req.body
+            const channels = await this.serverUseCase.executeCreateChannel(name,type,categoryId)
+            res.status(201).json({message:'Success',channels})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+            } 
+        }
+    }
 }

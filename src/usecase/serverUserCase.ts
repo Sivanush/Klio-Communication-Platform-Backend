@@ -4,7 +4,7 @@ import { ServerRepository } from "../adapters/repository/serverRepository";
 import { Server } from "../entity/server";
 import cloudinary from "../utils/cloudinary";
 import { IServerMember } from "../interfaces/serverInterface";
-import { ClientSession } from "mongoose";
+import mongoose, { ClientSession, Types } from "mongoose";
 import { serverModel } from "../adapters/repository/schema/serverSchema";
 import { generateInviteToken } from "../utils/common";
 
@@ -79,7 +79,6 @@ export class ServerUseCase {
         })
 
         const resolvedServers = await Promise.all(servers)
-        console.log(resolvedServers);
 
         return resolvedServers
     }
@@ -175,4 +174,46 @@ export class ServerUseCase {
             serverMemberCount
         }
     }
+
+
+    async executeCreateCategory(name:string,serverId:string){
+        if (!serverId) throw new Error("Server id not found");
+
+        console.log(serverId,'------')
+        console.log(Types.ObjectId.isValid(serverId));
+        
+        if (!Types.ObjectId.isValid(serverId)) {
+            throw new Error("Invalid server ID format");
+        }
+
+        const server = await this.serverRepository.getServerDetailById(serverId)
+
+        if (!server) throw new Error("Server Not Found Try Again");
+
+        const category = await this.serverRepository.createCategoryInServer(name,server._id.toString());
+
+        return category;
+        
+    }
+
+
+
+    async executeGetCategoryUnderServer(serverId:string){
+        if(!serverId) throw new Error("Server id not found");
+
+        const categories = await this.serverRepository.getCategoryUserServerById(serverId)
+
+        if (!categories) throw new Error("Categories Not Found");
+
+        return categories
+    }
+    
+
+    async executeCreateChannel(name:string,type:string,categoryId:string){        
+        const category = await this.serverRepository.findServerByCategoryId(categoryId)
+        if(!category) throw new Error("Server or category Not found");
+        const channel = await this.serverRepository.createChannelInCategory(name,type,category.server.toString(),categoryId)
+
+        return channel
+    } 
 }

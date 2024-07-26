@@ -20,4 +20,7 @@ serverRouter.get('/servers',auth.authMiddleware,serverController.getAllServers.b
 serverRouter.get('/server-detail/:serverId',auth.authMiddleware,serverController.getServerDetail.bind(serverController))
 serverRouter.post('/generate-invite-code',auth.authMiddleware,serverController.generateInviteCode.bind(serverController))
 serverRouter.post('/join-server',auth.authMiddleware,serverController.joinServer.bind(serverController))
-serverRouter.get('/server-detail-by-invite/:inviteCode',auth.authMiddleware,serverController.serverDetailByInvite.bind(serverController))
+serverRouter.get('/server-detail-by-invite/:inviteCode',serverController.serverDetailByInvite.bind(serverController))
+serverRouter.post('/create-category',auth.authMiddleware,serverController.createCategory.bind(serverController))
+serverRouter.get('/server-category/:serverId',auth.authMiddleware,serverController.getCategoryUnderServer.bind(serverController))
+serverRouter.post('/create-channel',auth.authMiddleware,serverController.createChannel.bind(serverController))

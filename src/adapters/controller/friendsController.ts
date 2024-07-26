@@ -51,7 +51,7 @@ export class FriendsController{
             }
 
             const senderId = req.user.userId
-            console.log(senderId);
+            // console.log(senderId);
 
 
             await this.friendsUseCase.executeSendRequest(receiverId, senderId)

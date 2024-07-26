@@ -3,10 +3,15 @@ import { Server as HttpServer } from 'http';
 import { DirectChatRepository } from '../../adapters/repository/directChatRepository';
 import { ChannelChatRepository } from '../../adapters/repository/channelChatRepository';
 import { UserRepository } from '../../adapters/repository/userRepository';
+import { FriendsRepository } from '../../adapters/repository/friendsRepository';
+import { friendsModel } from '../../adapters/repository/schema/friendsModel';
+import { userI } from '../../adapters/repository/schema/userModel';
+import { User } from '../../entity/user';
 
 const directChatRepository = new DirectChatRepository();
 const channelChatRepository = new ChannelChatRepository();
 const userRepository = new UserRepository();
+const friendsRepository = new FriendsRepository();
 const onlineUsers = new Map();
 
 export const setupSocket = (server: HttpServer) => {
@@ -18,9 +23,9 @@ export const setupSocket = (server: HttpServer) => {
     });
 
     io.on('connection', (socket) => {
-        console.log('A User Connected');
-        
+    
         socket.on('user-connect', async (userId) => {
+            console.log('A User Connected');
             onlineUsers.set(userId, { socketId: socket.id, lastActive: Date.now() });
             await userRepository.updateUserToOnline(userId)
             broadcastOnlineUsers();
@@ -61,15 +66,24 @@ export const setupSocket = (server: HttpServer) => {
             }
         });
 
+        socket.on('getFriendsStatus',async(userId)=>{
+            try {
+                const friends = await friendsRepository.getAllFriendsByUserId(userId)
+                socket.emit('friendsStatus', friends);
+            } catch (error) {
+                console.error('Error getting friends status:', error);
+            }
+        })
+
+        function broadcastUserStatus(userId:string, status:string) {
+            io.emit('userStatusUpdate', { userId, status });
+        }
 
         socket.on('markMessagesAsRead',async({userId,otherUserId})=>{
             try {
                 await directChatRepository.markMessagesAsRead(userId, otherUserId);
                 const unreadCount = await directChatRepository.getUnreadMessageCount(userId,otherUserId);
-                // io.to(socket.id).emit('unreadMessages', {
-                //     senderId: otherUserId,
-                //     count: unreadCount
-                //   });
+
                 const room = [userId, otherUserId].sort().join('-');
                 io.to(room).emit('messagesRead', { readBy: userId });
             } catch (error) {
@@ -104,7 +118,6 @@ export const setupSocket = (server: HttpServer) => {
 
         socket.on('getMoreMessages',async({userId,channelId,page,pageSize})=>{
             try {
-                console.log(userId,channelId,page,pageSize);
                 
                 const messages = await channelChatRepository.getChannelMessages(channelId, page, pageSize);
                 socket.emit('paginatedMessages', messages);
@@ -129,6 +142,28 @@ export const setupSocket = (server: HttpServer) => {
             }
 
         })
+
+
+        // socket.on('sendFriendRequest',({senderId,receiverId})=>{
+        //     const receiverSocketId = onlineUsers.get(receiverId)
+        //     if (receiverSocketId) {
+        //         io.to(receiverId).emit('newFriendRequest',{senderId})
+        //     }
+        // })
+
+
+        socket.on('sendFriendRequest', ({senderId, receiverId}) => {
+            console.log(`Friend request sent from ${senderId} to ${receiverId}`);
+            console.log(onlineUsers);
+            const receiverSocketId = onlineUsers.get(receiverId)?.socketId
+            if (receiverSocketId) {
+              console.log(`Emitting newFriendRequest to ${receiverId}`);
+              io.to(receiverSocketId).emit('newFriendRequest', {senderId})
+            } else {
+              console.log(`Receiver ${receiverId} not found in online users`)
+            }
+          });
+
 
 
         socket.on('heartbeat', (userId) => {

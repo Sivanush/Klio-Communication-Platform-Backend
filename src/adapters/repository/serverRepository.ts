@@ -1,4 +1,4 @@
-import { ClientSession } from "mongoose";
+import mongoose, { ClientSession } from "mongoose";
 import { Server } from "../../entity/server";
 import { categoryModel } from "./schema/categorySchema";
 import { channelModel } from "./schema/channelSchema";
@@ -67,6 +67,15 @@ export class ServerRepository{
         return await channel.save();
     }
 
+    async findServerByCategoryId(categoryId:string){
+        return await categoryModel.findById(categoryId)
+    }
+
+    getCategoryUserServerById(serverId:string){
+        return categoryModel.find({server:serverId})
+    }
+
+
     async getServerDetailById(serverId:string){
         return await serverModel.findById(serverId).lean()
         
@@ -104,4 +113,5 @@ export class ServerRepository{
     async findUserExistInTheServer(userId:string,serverId:string){
         return await serverMemberModel.findOne({userId: userId ,server:serverId}).lean()
     }
+    
 }   

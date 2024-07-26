@@ -62,6 +62,8 @@ export class FriendsRepository{
         return await requestModel.find({receiver:userId}).populate('sender')
      }
 
+     
+
      async findFriendRequest(requestId:string){
         return await requestModel.findById(requestId)
      }
