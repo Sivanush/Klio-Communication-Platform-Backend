@@ -5,9 +5,9 @@ import connectToDb from '../database/mongoose'
 import cors from "cors";
 import { adminRoute } from './routes/adminRoute';
 import { friendsRoute } from './routes/friendsRoute';
-import { setupSocket } from '../socket/directChatSocketService';
 import { serverRouter } from './routes/serverRoute';
 import { removeOldInvites } from '../../adapters/repository/schema/inviteCodeScema';
+import { setupSocket } from '../socket/setupSocket';
 
 const app = express()
 const server = createServer(app);
