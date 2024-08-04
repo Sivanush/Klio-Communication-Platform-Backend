@@ -24,3 +24,4 @@ serverRouter.get('/server-detail-by-invite/:inviteCode',serverController.serverD
 serverRouter.post('/create-category',auth.authMiddleware,serverController.createCategory.bind(serverController))
 serverRouter.get('/server-category/:serverId',auth.authMiddleware,serverController.getCategoryUnderServer.bind(serverController))
 serverRouter.post('/create-channel',auth.authMiddleware,serverController.createChannel.bind(serverController))
+serverRouter.get('/channel-detail/:channelId',auth.authMiddleware,serverController.getChannelDetail.bind(serverController))

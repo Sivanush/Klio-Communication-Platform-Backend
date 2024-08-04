@@ -156,8 +156,24 @@ export class ServerController{
     async createChannel(req:Request,res:Response){
         try {
             const {name,type,categoryId} = req.body
-            const channels = await this.serverUseCase.executeCreateChannel(name,type,categoryId)
-            res.status(201).json({message:'Success',channels})
+            const channel = await this.serverUseCase.executeCreateChannel(name,type,categoryId)
+            res.status(201).json({message:'Success',channel})
+        } catch (err) {
+            if (err instanceof Error) {
+                res.status(400).json({error:err.message})
+            } else {
+                res.status(500).json({error:'Internal Server Error'})
+            } 
+        }
+    }
+
+    async getChannelDetail(req:Request,res:Response){
+        try {
+            const {channelId} = req.params
+
+            const channelDetail = await this.serverUseCase.executeGetChannelDetail(channelId)
+
+            res.status(200).json({message:'Success',channelDetail})
         } catch (err) {
             if (err instanceof Error) {
                 res.status(400).json({error:err.message})

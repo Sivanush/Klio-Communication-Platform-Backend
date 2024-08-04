@@ -113,5 +113,9 @@ export class ServerRepository{
     async findUserExistInTheServer(userId:string,serverId:string){
         return await serverMemberModel.findOne({userId: userId ,server:serverId}).lean()
     }
+
+    async getChannelDetailById(channelId:string){
+        return await channelModel.findById(channelId).lean()
+    }
     
 }   

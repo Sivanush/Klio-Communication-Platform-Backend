@@ -216,4 +216,12 @@ export class ServerUseCase {
 
         return channel
     } 
+
+    async executeGetChannelDetail(channelId:string){
+        if(!channelId) throw new Error("Channel Id not found, Try again");
+        
+        const channel = await this.serverRepository.getChannelDetailById(channelId)
+
+        return channel
+    }
 }

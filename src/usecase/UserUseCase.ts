@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { DecodedData, User } from "../entity/user";
 import jwt from 'jsonwebtoken';
 import { ObjectId, Types } from "mongoose";
-
+import cloudinary from "../utils/cloudinary";
 import dotenv from 'dotenv';
 import { generateOtp, generateResetToken } from "../utils/common";
 import { MailerService } from "../adapters/services/mailerService";
@@ -103,10 +103,20 @@ export class UserUseCase {
 
             const hashedPassword = await bcrypt.hash(userEntity.uid as string, 10)
 
+            const userImage = await cloudinary.uploader.upload(userEntity.photoURL as string,(err,res)=>{
+                if (err) {
+                    throw new Error("Something went wrong in image, Please try again");
+                }else if(res){
+                    return res.secure_url
+                }else{
+                    throw new Error("Something went wrong in image, Please try again");
+                }
+            })
+
             const userData: User = {
                 email: userEntity.email,
                 username: userEntity.displayName,
-                image: userEntity.photoURL,
+                image: userImage.secure_url,
                 isVerified: true,
                 password: hashedPassword,
                 isBlocked: false,
