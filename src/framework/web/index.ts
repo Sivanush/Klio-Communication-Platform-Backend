@@ -14,7 +14,7 @@ import { errorHandler } from './middleware/errorHandler';
 
 const app = express()
 const server = createServer(app);
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.use(cors());
 connectToDb()
