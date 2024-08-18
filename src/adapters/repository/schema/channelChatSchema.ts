@@ -4,7 +4,8 @@ import mongoose, { model, ObjectId } from "mongoose"
 interface ChannelChatI {
     sender: ObjectId,
     channelId: ObjectId,
-    message: string
+    message: string,
+    fileType?: 'image' | 'video'|'text'
     timestamp: Date;
 }
 
@@ -22,6 +23,11 @@ const channelChatSchema = new mongoose.Schema<ChannelChatI>({
     message: {
         type: String,
         required: true
+    },
+    fileType: {
+        type: String,
+        default:'text',
+        enum: ['image', 'video', 'text'],
     }
 }, {
     timestamps: true

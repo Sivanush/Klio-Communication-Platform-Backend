@@ -14,7 +14,8 @@ export class User {
         public resetToken?:string|undefined,
         public resetTokenExpire?:number|undefined,
         public isGoogle?:boolean,
-        public bio?:string
+        public bio?:string,
+        public status?:string
 
 
     ) { }

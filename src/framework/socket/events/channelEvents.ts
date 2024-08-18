@@ -23,9 +23,18 @@ export const setupChannelEvents = (io: Server, socket: Socket) => {
         socket.leave(`channel-${channelId}`);
     });
 
-    socket.on('sendChannelMessage', async ({ userId, channelId, message }) => {
+    socket.on('sendChannelMessage', async ({ userId, channelId, message, fileUrl, fileType}) => {
         try {
-            const savedMessage = await channelChatRepository.sendMessage(userId, channelId, message);
+            let savedMessage
+
+            if (fileUrl) {    
+                savedMessage = await channelChatRepository.sendMessage(userId, channelId, `[${fileType}]${fileUrl}`, fileType);
+            } else {
+                savedMessage = await channelChatRepository.sendMessage(userId, channelId, message);
+            }
+
+
+            // const savedMessage = await channelChatRepository.sendMessage(userId, channelId, message);
             io.to(`channel-${channelId}`).emit('channelMessage', savedMessage);
         } catch (err) {
             console.log("Error in Channel Send Message ", err);

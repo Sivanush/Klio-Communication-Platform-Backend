@@ -7,8 +7,10 @@
         
         
         
-        async sendMessage(senderId:string,receiverId:string,message:string){
-            const newMessage = new directChatModel({senderId,receiverId,message})
+        async sendMessage(senderId:string,receiverId:string,message:string,fileType?:string){
+            console.log(message);
+            
+            const newMessage = new directChatModel({senderId,receiverId,message,fileType})
             return await newMessage.save()
         }
 

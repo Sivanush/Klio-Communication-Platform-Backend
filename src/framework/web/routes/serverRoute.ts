@@ -25,3 +25,6 @@ serverRouter.post('/create-category',auth.authMiddleware,serverController.create
 serverRouter.get('/server-category/:serverId',auth.authMiddleware,serverController.getCategoryUnderServer.bind(serverController))
 serverRouter.post('/create-channel',auth.authMiddleware,serverController.createChannel.bind(serverController))
 serverRouter.get('/channel-detail/:channelId',auth.authMiddleware,serverController.getChannelDetail.bind(serverController))
+serverRouter.get('/servers/:serverId',auth.authMiddleware,serverController.getAllUserForServer.bind(serverController))
+serverRouter.get('/servers/admin/:serverId/:userId',auth.authMiddleware,serverController.findAdminForServer.bind(serverController))
+serverRouter.get('/servers/kick/:serverId/:userId',auth.authMiddleware,serverController.kickUserInServer.bind(serverController))

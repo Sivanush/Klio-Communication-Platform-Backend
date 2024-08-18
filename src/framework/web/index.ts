@@ -8,6 +8,7 @@ import { friendsRoute } from './routes/friendsRoute';
 import { serverRouter } from './routes/serverRoute';
 import { removeOldInvites } from '../../adapters/repository/schema/inviteCodeScema';
 import { setupSocket } from '../socket/setupSocket';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express()
 const server = createServer(app);
@@ -22,7 +23,11 @@ app.use('/api/',friendsRoute)
 app.use('/api/',serverRouter)
 app.use('/api/admin/',adminRoute)
 
+app.use(errorHandler)
+
 setupSocket(server)
+
+
 
 setInterval(removeOldInvites, 24 * 60 * 60 * 1000);
 

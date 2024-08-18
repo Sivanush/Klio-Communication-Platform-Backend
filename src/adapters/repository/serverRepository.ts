@@ -1,4 +1,4 @@
-import mongoose, { ClientSession } from "mongoose";
+import mongoose, { ClientSession, Types } from "mongoose";
 import { Server } from "../../entity/server";
 import { categoryModel } from "./schema/categorySchema";
 import { channelModel } from "./schema/channelSchema";
@@ -118,4 +118,45 @@ export class ServerRepository{
         return await channelModel.findById(channelId).lean()
     }
     
+
+    async getUsersInServer(serverId:string){
+
+        
+        return await serverMemberModel.aggregate([
+            {
+                $match:{
+                    server:new Types.ObjectId(serverId)
+                }
+            },
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user' 
+            },
+            {
+                $project:{
+                    _id:0,
+                    user:1
+                }
+            }
+        ])
+    }
+
+
+    async findAdminForServer(userId:string,serverId:string){
+        return await serverMemberModel.findOne({
+            userId:userId,
+            server:serverId
+        })
+    }
+
+    async kickUserByUserId(serverId:string,userId:string){
+        return await serverMemberModel.deleteOne({userId:userId,server:serverId})
+    }
 }   

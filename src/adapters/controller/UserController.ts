@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserRepository } from "../repository/userRepository";
 import { User } from "../../entity/user";
 import { UserUseCase } from "../../usecase/UserUseCase";
@@ -9,7 +9,7 @@ export class UserController {
         this.userUseCase = new UserUseCase(this.userRepository)
     }
 
-    async signUp(req: Request, res: Response): Promise<void> {
+    async signUp(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             let { username, email, password } = req.body
 
@@ -23,15 +23,11 @@ export class UserController {
             res.status(201).json(result)
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ message: "Internal Server Error" });
-            }
+            next(err)
         }
     }
 
-    async login(req: Request, res: Response) {
+    async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body
 
         try {
@@ -45,18 +41,13 @@ export class UserController {
 
             res.status(200).json({ token });
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ message: err.message });
-            } else {
-                res.status(400).json({ message: "Internal Server Error" });
-            }
-
+            next(err)
         }
     }
 
-    async resendOtp(req: Request, res: Response){
+    async resendOtp(req: Request, res: Response, next: NextFunction) {
         try {
-            
+
             const { email } = req.body
 
             if (!email) {
@@ -69,19 +60,13 @@ export class UserController {
             res.status(201).json(result)
 
         } catch (err) {
-            if (err instanceof Error) {
-
-                res.status(400).json({ message: err.message })
-            } else {
-
-                res.status(400).json({ message: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
 
 
-    async otpVerification(req: Request, res: Response) {
+    async otpVerification(req: Request, res: Response, next: NextFunction) {
         try {
 
             const { otp, otpToken } = req.body
@@ -98,18 +83,11 @@ export class UserController {
             res.status(200).json({ message: 'OTP Verification Successfully', result })
 
         } catch (err) {
-
-            if (err instanceof Error) {
-
-                res.status(400).json({ message: err.message })
-            } else {
-
-                res.status(400).json({ message: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
-    async googleAuth(req: Request, res: Response) {
+    async googleAuth(req: Request, res: Response, next: NextFunction) {
         try {
             const { uid, email, displayName, photoURL } = req.body
 
@@ -123,16 +101,12 @@ export class UserController {
 
             res.status(201).json({ message: "Success", token: result })
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ message: err.message })
-            } else {
-                res.status(400).json({ message: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
 
-    async forgetPassword(req: Request, res: Response) {
+    async forgetPassword(req: Request, res: Response, next: NextFunction) {
         try {
             const { email } = req.body
 
@@ -148,8 +122,7 @@ export class UserController {
             if (err instanceof Error) {
                 res.status(400).json({ error: err.message })
             } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
+                next(err)
             }
         }
     }
@@ -157,7 +130,7 @@ export class UserController {
 
 
 
-    async resetPassword(req: Request, res: Response) {
+    async resetPassword(req: Request, res: Response, next: NextFunction) {
         try {
 
             const { token, newPassword } = req.body
@@ -171,93 +144,68 @@ export class UserController {
             res.status(200).json({ message: 'Password reset successfully' });
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 
 
-    async getUserData(req: Request, res: Response){
+    async getUserData(req: Request, res: Response, next: NextFunction) {
         try {
 
             const userId = req.user?.userId
             console.log(userId);
-            
+
             const userData = await this.userUseCase.executeGetUserData(userId as string)
-            
+
             res.json(userData)
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 
 
-    async getUserDataForFriend(req: Request, res: Response){
+    async getUserDataForFriend(req: Request, res: Response, next: NextFunction) {
         try {
-            const {userId} = req.params
+            const { userId } = req.params
 
             const userData = await this.userUseCase.executeGetUserDataForFriend(userId)
-            
+
 
             res.json(userData)
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 
 
 
-    async updateBioOfUser(req: Request, res: Response){
+    async updateBioOfUser(req: Request, res: Response, next: NextFunction) {
         try {
             const { bio } = req.body
             const userId = req.user?.userId
 
-            await this.userUseCase.executeUpdateBioOfUser(bio,userId as string)
+            await this.userUseCase.executeUpdateBioOfUser(bio, userId as string)
 
-            res.status(200).json({message:'Success'})
+            res.status(200).json({ message: 'Success' })
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 
 
 
-    async updateStatus(req: Request, res: Response){
+    async updateStatus(req: Request, res: Response, next: NextFunction) {
         try {
-            const {status,customStatus} = req.body
+            const { status, customStatus } = req.body
             const userId = req.user?.userId
 
-            await this.userUseCase.executeUpdateStatus(status,customStatus,userId as string)
+            await this.userUseCase.executeUpdateStatus(status, customStatus, userId as string)
 
 
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(500).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 

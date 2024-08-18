@@ -28,5 +28,3 @@ userRouter.post('/update-bio',auth.authMiddleware,userController.updateBioOfUser
 userRouter.post('/update-status',auth.authMiddleware,userController.updateStatus.bind(userController))
 
 
-
-

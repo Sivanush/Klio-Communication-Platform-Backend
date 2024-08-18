@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { DirectChatRepository } from '../../../adapters/repository/directChatRepository';
+import cloudinary from '../../../utils/cloudinary';
 
 const directChatRepository = new DirectChatRepository();
 
@@ -12,11 +13,17 @@ export const setupChatEvents = (io: Server, socket: Socket, onlineUsers: Map<str
         });
     });
 
-    socket.on('sendMessage', async ({ senderId, receiverId, message }) => {
+    socket.on('sendMessage', async ({ senderId, receiverId, message ,fileUrl, fileType}) => {
         const room = [senderId, receiverId].sort().join('-');
 
         try {
-            const savedMessage = await directChatRepository.sendMessage(senderId, receiverId, message);
+            let savedMessage;
+
+            if (fileUrl) {    
+                savedMessage = await directChatRepository.sendMessage(senderId, receiverId, `[${fileType}]${fileUrl}`, fileType);
+            } else {
+                savedMessage = await directChatRepository.sendMessage(senderId, receiverId, message);
+            }
             const updatedMessage = await directChatRepository.getMessageById(savedMessage._id as unknown as string);
             io.to(room).emit('message', updatedMessage);
 

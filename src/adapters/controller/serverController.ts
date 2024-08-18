@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ServerUseCase } from "../../usecase/serverUserCase";
 import { ServerRepository } from "../repository/serverRepository";
 import { Server } from "../../entity/server";
@@ -10,7 +10,7 @@ export class ServerController{
     }
 
 
-    async createServer(req:Request,res:Response){
+    async createServer(req:Request,res:Response,next: NextFunction){
         try {
             const { serverName } = req.body
             const owner = req.user?.userId
@@ -30,31 +30,23 @@ export class ServerController{
 
             res.status(201).json({message:'Server Created'})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            }
+           next(err)
         }
     }
 
 
-    async getAllServers(req:Request,res:Response){
+    async getAllServers(req:Request,res:Response,next: NextFunction){
         try {
             const userId = req.user?.userId
             const servers = await this.serverUseCase.executeGetAllServers(userId as string)
             res.status(200).json(servers)
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            }
+           next(err)
         }
     }
 
 
-    async getServerDetail(req:Request,res:Response){
+    async getServerDetail(req:Request,res:Response,next: NextFunction){
         try {
             const {serverId} = req.params
 
@@ -63,44 +55,32 @@ export class ServerController{
             res.status(200).json(serverDetails)
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async generateInviteCode(req:Request,res:Response){
+    async generateInviteCode(req:Request,res:Response,next: NextFunction){
         try {
             const {serverId} = req.body            
             const newInvite = await this.serverUseCase.executeGenerateInviteCode(serverId)
             res.status(201).json({message:'Success',inviteCode:newInvite.inviteCode,expireDate:newInvite.expireDate})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async joinServer(req:Request,res:Response){
+    async joinServer(req:Request,res:Response,next: NextFunction){
         try {
             const {inviteCode,userId} = req.body
             const serverData = await this.serverUseCase.executeJoinServer(inviteCode,userId)
 
             res.status(201).json({message:'Success',serverData})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async serverDetailByInvite(req:Request,res:Response){
+    async serverDetailByInvite(req:Request,res:Response,next: NextFunction){
         try {
             
             const {inviteCode} = req.params
@@ -112,15 +92,11 @@ export class ServerController{
             
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async createCategory(req:Request,res:Response){
+    async createCategory(req:Request,res:Response,next: NextFunction){
         try {
             const {name,serverId} = req.body
             
@@ -129,15 +105,11 @@ export class ServerController{
 
             res.status(201).json({message:"Success",category})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async getCategoryUnderServer(req:Request,res:Response){
+    async getCategoryUnderServer(req:Request,res:Response,next: NextFunction){
         try {
             const {serverId} = req.params
 
@@ -145,29 +117,21 @@ export class ServerController{
 
             res.status(200).json({message:'Success',categories})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async createChannel(req:Request,res:Response){
+    async createChannel(req:Request,res:Response,next: NextFunction){
         try {
             const {name,type,categoryId} = req.body
             const channel = await this.serverUseCase.executeCreateChannel(name,type,categoryId)
             res.status(201).json({message:'Success',channel})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
         }
     }
 
-    async getChannelDetail(req:Request,res:Response){
+    async getChannelDetail(req:Request,res:Response,next: NextFunction){
         try {
             const {channelId} = req.params
 
@@ -175,11 +139,48 @@ export class ServerController{
 
             res.status(200).json({message:'Success',channelDetail})
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({error:err.message})
-            } else {
-                res.status(500).json({error:'Internal Server Error'})
-            } 
+           next(err) 
+        }
+    }
+
+    async getAllUserForServer(req:Request,res:Response,next: NextFunction){
+        try {
+
+            const {serverId} = req.params
+
+            const userDetails = await this.serverUseCase.executeGetAllUserForServer(serverId)
+
+            res.status(200).json(userDetails)
+
+        } catch (err) {
+            next(err) 
+        }
+    }
+
+    async findAdminForServer(req:Request,res:Response,next: NextFunction){
+        try {
+            
+            const {userId,serverId} = req.params
+
+            const isAdmin = await this.serverUseCase.executeFindAdminForServer(userId,serverId)
+
+            res.status(200).json(isAdmin)
+
+        } catch (err) {
+            next(err) 
+        }
+    }
+
+    async kickUserInServer(req:Request,res:Response,next: NextFunction){
+        try {
+            const {userId,serverId} = req.params
+
+            await this.serverUseCase.executeKickUserInServer(userId,serverId)
+
+            res.status(200).json({message:'Success'})
+
+        } catch (err) {
+            next(err) 
         }
     }
 }

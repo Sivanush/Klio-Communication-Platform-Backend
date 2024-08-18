@@ -1,14 +1,14 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { FriendsUseCase } from "../../usecase/friendsUseCase";
 import { FriendsRepository } from "../repository/friendsRepository";
 
 
-export class FriendsController{
-    constructor(private friendsRepository:FriendsRepository,private friendsUseCase:FriendsUseCase) {
-        
+export class FriendsController {
+    constructor(private friendsRepository: FriendsRepository, private friendsUseCase: FriendsUseCase) {
+
     }
-    
-    async searchUsers(req: Request, res: Response) {
+
+    async searchUsers(req: Request, res: Response, next: NextFunction) {
         try {
 
 
@@ -17,31 +17,26 @@ export class FriendsController{
             }
 
             const mainUser = req.user.userId
-            
+
 
             if (!req.query.query || !mainUser) {
                 res.status(400).json({ error: 'Something Went Wrong, Try Again' })
             }
-            const users = await this.friendsUseCase.executeSearchUsers(req.query.query as string,mainUser)
+            const users = await this.friendsUseCase.executeSearchUsers(req.query.query as string, mainUser)
 
             res.status(200).json({ users: users })
 
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-
-            }
+            next(err)
         }
     }
 
-   
 
 
 
-    async sendRequest(req: Request, res: Response) {
+
+    async sendRequest(req: Request, res: Response, next: NextFunction) {
         try {
 
             const { receiverId } = req.body
@@ -58,16 +53,12 @@ export class FriendsController{
 
             res.status(201).json({ message: 'Friend Request Sended Successfully' })
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
 
-    async listPendingRequest(req: Request, res: Response) {
+    async listPendingRequest(req: Request, res: Response, next: NextFunction) {
         try {
 
             if (!req.user || !req.user.userId) {
@@ -79,42 +70,34 @@ export class FriendsController{
 
             const requests = await this.friendsUseCase.executeListPendingRequest(userId)
 
-            res.status(200).json({message:'Pending request successfully received', requests})
+            res.status(200).json({ message: 'Pending request successfully received', requests })
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
-    async acceptFriendRequest(req: Request, res: Response){
+    async acceptFriendRequest(req: Request, res: Response, next: NextFunction) {
         try {
-            
+
             const { requestId } = req.body
 
             if (!requestId) {
                 return res.status(400).json({ message: 'Something Went Wrong, Try Again' });
-              }
+            }
 
             await this.friendsUseCase.executeAcceptFriendRequest(requestId)
 
 
-            res.status(200).json({message:'Friends Request Accepted '})
+            res.status(200).json({ message: 'Friends Request Accepted ' })
 
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-            }
+            next(err)
         }
     }
 
 
-    async rejectFriendRequest(req:Request,res:Response){
+    async rejectFriendRequest(req: Request, res: Response,next: NextFunction) {
         try {
             const { requestId } = req.body
 
@@ -127,37 +110,31 @@ export class FriendsController{
             await this.friendsUseCase.executeRejectFriendRequest(requestId)
 
             res.status(200).json({ message: 'Friend Request Rejected' });
-            
+
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-            } 
+            next(err)
         }
+
     }
 
-    async getAllFriends(req:Request,res:Response){
+    async getAllFriends(req: Request, res: Response,next: NextFunction) {
         try {
-            
+
             const userId = req.user?.userId
 
             if (userId === undefined) {
                 res.status(400).json({ error: 'Something Went Wrong, Try Again' })
-                return 
+                return
             }
 
             const friends = await this.friendsUseCase.executeGetAllFriends(userId)
 
-            res.status(200).json(friends? friends : [])
+            res.status(200).json(friends ? friends : [])
 
         } catch (err) {
-            if (err instanceof Error) {
-                res.status(400).json({ error: err.message })
-            } else {
-                res.status(400).json({ error: 'Internal Server Error' })
-            } 
+            next(err)
         }
+
     }
 
 }

@@ -5,7 +5,8 @@ export interface directChatI extends Document{
     receiverId: ObjectId;
     message: string;
     timestamp: Date;
-    isRead:boolean
+    isRead:boolean,
+    fileType?: 'image' | 'video'|'text'
 }
 
 const directMessageSchema = new mongoose.Schema<directChatI>({
@@ -24,6 +25,11 @@ const directMessageSchema = new mongoose.Schema<directChatI>({
     isRead:{
         type:Boolean,
         default:false
+    },
+    fileType: {
+        type: String,
+        default:'text',
+        enum: ['image', 'video', 'text'],
     }
     
 },{

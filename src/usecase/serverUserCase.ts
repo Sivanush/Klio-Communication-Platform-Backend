@@ -7,6 +7,7 @@ import { IServerMember } from "../interfaces/serverInterface";
 import mongoose, { ClientSession, Types } from "mongoose";
 import { serverModel } from "../adapters/repository/schema/serverSchema";
 import { generateInviteToken } from "../utils/common";
+import { ServerRole } from "../adapters/repository/schema/serverMemberSchema";
 
 
 
@@ -224,4 +225,36 @@ export class ServerUseCase {
 
         return channel
     }
+
+    async executeGetAllUserForServer(serverId:string){
+        if (!serverId) throw new Error("Server Id not found, Try again");
+
+        const userDetail = await this.serverRepository.getUsersInServer(serverId)        
+
+        return userDetail
+    }
+
+
+    async executeFindAdminForServer(userId: string, serverId: string): Promise<boolean> {
+        if (!userId) throw new Error("User Id not found, Try again");
+        if (!serverId) throw new Error("Server Id not found, Try again");
+    
+        const isAdmin = await this.serverRepository.findAdminForServer(userId, serverId);
+    
+        if (isAdmin && Array.isArray(isAdmin.roles) && isAdmin.roles.includes(ServerRole.ADMIN)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    async executeKickUserInServer(userId:string,serverId:string){
+        if (!userId) throw new Error("User Id not found, Try again");
+        if (!serverId) throw new Error("Server Id not found, Try again");
+
+        await this.serverRepository.kickUserByUserId(serverId,userId)
+    }
+    
+    
 }

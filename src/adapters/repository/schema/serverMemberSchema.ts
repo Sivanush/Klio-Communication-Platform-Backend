@@ -1,7 +1,7 @@
 import { model, ObjectId, Schema } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 
-enum ServerRole {
+export enum ServerRole {
     OWNER = 'owner',
     ADMIN = 'admin',
     MODERATOR = 'moderator',

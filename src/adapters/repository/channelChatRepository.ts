@@ -14,7 +14,7 @@ export class ChannelChatRepository {
             .lean();
     }
 
-    sendMessage(userId: string, channelId: string, message: string) {
+    sendMessage(userId: string, channelId: string, message: string, fileType?:string) {
         const newMessage = new channelChatModel({
             sender: userId,
             channelId: channelId,

@@ -46,7 +46,13 @@ export class UserAuth{
                 return res.status(401).send('Access Denied: Invalid Token Or Expired Provided!');
             }
         } catch (err) {
-            res.status(400).send('Invalid Token');
+            if (err instanceof jwt.TokenExpiredError) {
+                return res.status(401).send('Token Expired');
+            }
+            if (err instanceof Error) {
+                return res.status(400).send(`Invalid Token: ${err.message}`);
+            }
+            return res.status(500).send('Internal Server Error');
         }
-    } 
+    }
 }
