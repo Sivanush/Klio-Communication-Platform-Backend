@@ -1,7 +1,7 @@
 import mongoose, { model, ObjectId } from "mongoose"
 
 
-interface ChannelChatI {
+interface ChannelChatI { 
     sender: ObjectId,
     channelId: ObjectId,
     message: string,
