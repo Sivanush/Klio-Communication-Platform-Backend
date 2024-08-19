@@ -16,10 +16,24 @@ const app = express()
 const server = createServer(app);
 const port = process.env.PORT || 3000
 
-app.use(cors({
-   origin: '*',
- }));
+// app.use(cors({
+//    origin: '*',
+//  }))
+
+
+
+const corsOptions = {
+   origin: 'https://klio-sivanushs-projects.vercel.app', // Allow this origin
+   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+   credentials: true,
+ };
  
+ app.use(cors(corsOptions));
+
+
+
+
+
 connectToDb()
 
 app.use(express.json())
