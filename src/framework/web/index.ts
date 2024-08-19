@@ -17,7 +17,7 @@ const server = createServer(app);
 const port = process.env.PORT || 3000
 
 app.use(cors({
-   origin: '*', // Allows all domains
+   origin: '*',
  }));
  
 connectToDb()
