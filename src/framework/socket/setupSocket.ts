@@ -2,16 +2,19 @@ import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { broadcastOnlineUsers } from './utils/broadcast';
 import { setupSocketEvents } from './events/indexEvent';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const onlineUsers = new Map();
 
 export const setupSocket = (server: HttpServer) => {
     const io = new Server(server, {
         cors: {
-            origin: 'http://localhost:4200',
+            origin: ['http://localhost:4200', process.env.CLIENT_URL || ''],
             methods: ["GET", "POST"]
         }
     });
+    
 
     io.on('connection', (socket) => {
         setupSocketEvents(io, socket, onlineUsers);
