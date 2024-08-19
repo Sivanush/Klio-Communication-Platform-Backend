@@ -23,10 +23,15 @@ const port = process.env.PORT || 3000
 
 
 const corsOptions = {
-   origin: 'https://klio-sivanushs-projects.vercel.app', // Allow this origin
-   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-   credentials: true,
+   origin: '*',
+   methods: 'GET,PUT,POST,PATCH,OPTIONS',
+   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
  };
+ 
+ 
+ // Use CORS middleware
+ 
+ 
  
  app.use(cors(corsOptions));
 
