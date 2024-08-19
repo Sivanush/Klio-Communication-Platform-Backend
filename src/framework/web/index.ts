@@ -16,7 +16,10 @@ const app = express()
 const server = createServer(app);
 const port = process.env.PORT || 3000
 
-app.use(cors());
+app.use(cors({
+   origin: '*', // Allows all domains
+ }));
+ 
 connectToDb()
 
 app.use(express.json())
