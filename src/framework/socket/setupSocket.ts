@@ -10,7 +10,7 @@ const onlineUsers = new Map();
 export const setupSocket = (server: HttpServer) => {
     const io = new Server(server, {
         cors: {
-            origin: ['http://localhost:4200', process.env.CLIENT_URL || ''],
+            origin: ['http://localhost:4200', process.env.CLIENT_URL as string],
             methods: ["GET", "POST"]
         }
     });
