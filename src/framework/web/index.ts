@@ -11,6 +11,7 @@ import { serverRouter } from './routes/serverRoute';
 import { removeOldInvites } from '../../adapters/repository/schema/inviteCodeScema';
 import { setupSocket } from '../socket/setupSocket';
 import { errorHandler } from './middleware/errorHandler';
+import { postRouter } from './routes/postRoute';
 
 const app = express()
 const server = createServer(app);
@@ -45,6 +46,7 @@ app.use(express.json())
 app.use('/api/',userRouter)
 app.use('/api/',friendsRoute)
 app.use('/api/',serverRouter)
+app.use('/api/',postRouter)
 app.use('/api/admin/',adminRoute)
 
 app.use(errorHandler)
