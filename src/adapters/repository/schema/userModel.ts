@@ -14,7 +14,8 @@ export interface userI extends Document{
     timestamps:Date,
     bio:string,
     status:string,
-    customStatus:string
+    customStatus:string,
+    banner:string
 }
 
 const userSchema = new Schema<userI>({
@@ -38,6 +39,10 @@ const userSchema = new Schema<userI>({
     image:{
         type:String,
         default:'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2281862025.jpg'
+    },
+    banner:{
+        type:String,
+        default:'https://discord-bucket-7.s3.ap-south-1.amazonaws.com/jn8jyih8obj71.webp',
     },
     isBlocked:{
         type:Boolean,

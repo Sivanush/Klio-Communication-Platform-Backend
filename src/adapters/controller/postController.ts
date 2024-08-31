@@ -36,7 +36,7 @@ export class PostController {
 
     async getUserPost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId = req.user?.userId
+            const {userId} = req.params
 
             const posts = await this.postUseCase.executeGetUserPost(userId!)
 
@@ -45,7 +45,37 @@ export class PostController {
             next(err)
         }
     }
+
+    async getExplorePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user?.userId
+
+            const posts = await this.postUseCase.executeGetExplorePost(userId!)
+
+            res.status(200).json(posts)
+        } catch (err) {
+            next(err)
+        }
+    }
+
+
+    async likeAndUnlikePost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user?.userId
+            const {postId} = req.params
+
+            await this.postUseCase.executeLikeAndUnlikePost(userId!,postId)
+
+            res.status(200).json({message:'Success'})
+        } catch (err) {
+            next(err)
+        }
+    }
+
 }
+
+
+
 
 
 

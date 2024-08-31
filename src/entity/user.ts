@@ -2,11 +2,11 @@ export class User {
     constructor(
 
         public username: string | undefined,
-        public email: string,
-        public password: string,
-        public isVerified: boolean,
-        public isBlocked: boolean,
-        public image: string | undefined,
+        public email?: string,
+        public password?: string,
+        public isVerified?: boolean,
+        public isBlocked?: boolean,
+        public image?: string | undefined,
         public _id?: string,
         public photoURL?: string,
         public displayName?: string, 
@@ -15,7 +15,8 @@ export class User {
         public resetTokenExpire?:number|undefined,
         public isGoogle?:boolean,
         public bio?:string,
-        public status?:string
+        public status?:string,
+        public banner?:string
 
 
     ) { }

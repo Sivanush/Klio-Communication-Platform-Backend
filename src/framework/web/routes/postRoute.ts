@@ -10,10 +10,12 @@ import { UserAuth } from '../middleware/userAuth';
 
 
 export const postRouter = express.Router()
-const serverRepository = new PostRepository()
-const serverUseCase = new PostUseCase(serverRepository)
-const serverController = new PostController(serverUseCase,serverRepository)
+const postRepository = new PostRepository()
+const postUseCase = new PostUseCase(postRepository)
+const postController = new PostController(postUseCase,postRepository)
 const auth = new UserAuth()
 
-postRouter.post('/create-post',auth.authMiddleware,serverController.createPost.bind(serverController))
-postRouter.get('/user-post',auth.authMiddleware,serverController.getUserPost.bind(serverController))
+postRouter.post('/create-post',auth.authMiddleware,postController.createPost.bind(postController))
+postRouter.get('/user-post/:userId',auth.authMiddleware,postController.getUserPost.bind(postController))
+postRouter.get('/explore-post',auth.authMiddleware,postController.getExplorePost.bind(postController))
+postRouter.get('/like-post/:postId',auth.authMiddleware,postController.likeAndUnlikePost.bind(postController))

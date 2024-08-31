@@ -16,7 +16,7 @@ export class UserUseCase {
 
     async executeSignup(userEntity: User) {
 
-        const existUser = await this.userRepository.findUserByEmail(userEntity.email)
+        const existUser = await this.userRepository.findUserByEmail(userEntity.email!)
 
         if (existUser && existUser.isVerified === true) {
             throw new Error('User Already Exist')
@@ -24,8 +24,8 @@ export class UserUseCase {
             await this.userRepository.deleteTheUserById(existUser._id as string)
         }
 
-        const hashedPassword = await bcrypt.hash(userEntity.password, 10)
-        userEntity.password = hashedPassword
+        const hashedPassword = await bcrypt.hash(userEntity.password!, 10)
+        userEntity.password! = hashedPassword
 
         const createUser = await this.userRepository.createUser(userEntity)
 
@@ -33,7 +33,7 @@ export class UserUseCase {
         console.log('OTP is Generated: ' + otp);
 
 
-        await mailerService.sendEmail(createUser.email, otp)
+        await mailerService.sendEmail(createUser.email!, otp)
 
         const otpToken = jwt.sign({ email: createUser.email, otp }, process.env.JWT_SECRET_C0DE as string, { expiresIn: "1h" })
 
@@ -43,7 +43,7 @@ export class UserUseCase {
 
     async executeLogin(userEntity: User) {
 
-        const user = await this.userRepository.findUserByEmail(userEntity.email)
+        const user = await this.userRepository.findUserByEmail(userEntity.email!)
 
         if (user?.isGoogle === true) {
             throw new Error('Account linked to Google. Please sign in with Google to continue.')
@@ -52,7 +52,7 @@ export class UserUseCase {
             throw new Error('Your account is blocked By The Admin')
         }
 
-        if (!user || !await bcrypt.compare(userEntity.password, user.password)) {
+        if (!user || !await bcrypt.compare(userEntity.password!, user.password!)) {
             throw new Error('Invalid credentials');
         }
 
@@ -91,7 +91,7 @@ export class UserUseCase {
 
 
     async executeGoogleAuth(userEntity: User) {
-        const user = await this.userRepository.findUserByEmail(userEntity.email)
+        const user = await this.userRepository.findUserByEmail(userEntity.email!)
 
         if (user) {
             if (user?.isBlocked === true) {            
@@ -180,23 +180,9 @@ export class UserUseCase {
     }
 
 
-    async executeUpdateBioOfUser(bio:string,userId:string){
-        if (!bio) {
-            throw new Error("Please Provide the About Me");
-        }else if(!userId){
-            throw new Error("Something went wrong, Please try again");
-        }
-        await this.userRepository.updateUserBio(bio,userId)
-    }
+    async executeUpdateProfile(userData:User){
 
-    executeUpdateStatus(status:string,customStatus:string,userId:string){
-        if (!status) {
-            throw new Error("Status is not provided");
-        }else if(!customStatus){
-            throw new Error("Custom Status is not provided");
-        }else if(!userId){
-            throw new Error("Something went wrong, Please try again");
-        }
-        return this.userRepository.updateUserStatus(status,customStatus,userId)
+
+        return await this.userRepository.updateUser(userData)
     }
 }

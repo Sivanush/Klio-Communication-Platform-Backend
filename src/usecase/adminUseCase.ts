@@ -16,9 +16,9 @@ export class AdminUseCase {
 
 
     async executeLogin(adminData: User) {
-        const userData = await this.adminRepository.findAdminUser(adminData.email)
+        const userData = await this.adminRepository.findAdminUser(adminData.email!)
 
-        if (!userData || !await bcrypt.compare(adminData.password, userData.password)) {
+        if (!userData || !await bcrypt.compare(adminData.password!, userData.password)) {
             throw new Error("Invalid Credentials");
         }
 

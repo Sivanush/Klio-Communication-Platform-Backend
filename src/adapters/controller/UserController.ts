@@ -180,30 +180,19 @@ export class UserController {
 
 
 
-    async updateBioOfUser(req: Request, res: Response, next: NextFunction) {
+    async updateProfile(req: Request, res: Response, next: NextFunction){
         try {
-            const { bio } = req.body
-            const userId = req.user?.userId
+            
+            const {_id,username,bio,status,image,banner} = req.body
 
-            await this.userUseCase.executeUpdateBioOfUser(bio, userId as string)
+            console.log(_id,username,bio,status,image,banner);
+            
 
-            res.status(200).json({ message: 'Success' })
-        } catch (err) {
-            next(err)
-        }
-    }
+            const userData:User =  {_id,username,bio,status,image,banner}
 
+            await this.userUseCase.executeUpdateProfile(userData)
 
-
-    async updateStatus(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { status, customStatus } = req.body
-            const userId = req.user?.userId
-
-            await this.userUseCase.executeUpdateStatus(status, customStatus, userId as string)
-
-
-
+            res.status(200).json({message:'Success'})
         } catch (err) {
             next(err)
         }

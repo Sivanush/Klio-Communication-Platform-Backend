@@ -6,7 +6,8 @@ export interface directChatI extends Document{
     message: string;
     timestamp: Date;
     isRead:boolean,
-    fileType?: 'image' | 'video'|'text'
+    fileType?: 'image' | 'video'|'text',
+    thumbnailUrl:String
 }
 
 const directMessageSchema = new mongoose.Schema<directChatI>({
@@ -30,6 +31,9 @@ const directMessageSchema = new mongoose.Schema<directChatI>({
         type: String,
         default:'text',
         enum: ['image', 'video', 'text'],
+    },
+    thumbnailUrl:{
+        type:String
     }
     
 },{

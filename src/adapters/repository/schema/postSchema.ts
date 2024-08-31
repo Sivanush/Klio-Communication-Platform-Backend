@@ -2,6 +2,7 @@ import mongoose, { model, Types } from "mongoose";
 
 
 export interface IComment {
+    postId:Types.ObjectId
     content: string;
     author: Types.ObjectId;
     timestamp: Date;
@@ -13,7 +14,7 @@ export interface IPost extends Document {
     mediaUrl?: string;
     mediaType?: string;
     likes: Types.ObjectId[];
-    comments: IComment[];
+    comments: Types.ObjectId[];
     timestamp: Date;
 }
 
@@ -37,21 +38,11 @@ const postSchema = new mongoose.Schema<IPost>({
     },
     likes:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        ref:'Like'
     }],
-    comments:[{
-        content:{
-            type:String,
-            required:true   
-        },
-        author:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:'User'
-        },
-        timestamp: { 
-            type: Date, 
-            default: Date.now 
-        }
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
     }],
     timestamp: { 
         type: Date, 

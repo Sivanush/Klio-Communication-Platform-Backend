@@ -24,7 +24,7 @@ userRouter.post('/forget-password',userController.forgetPassword.bind(userContro
 userRouter.post('/reset-password',userController.resetPassword.bind(userController))
 userRouter.get('/user-data',auth.authMiddleware,userController.getUserData.bind(userController))
 userRouter.get('/user/:userId',auth.authMiddleware,userController.getUserDataForFriend.bind(userController))
-userRouter.post('/update-bio',auth.authMiddleware,userController.updateBioOfUser.bind(userController))
-userRouter.post('/update-status',auth.authMiddleware,userController.updateStatus.bind(userController))
+userRouter.post('/update-profile',auth.authMiddleware,userController.updateProfile.bind(userController))
+
 
 

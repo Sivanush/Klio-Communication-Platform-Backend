@@ -13,14 +13,14 @@ export const setupChatEvents = (io: Server, socket: Socket, onlineUsers: Map<str
         });
     });
 
-    socket.on('sendMessage', async ({ senderId, receiverId, message ,fileUrl, fileType}) => {
+    socket.on('sendMessage', async ({ senderId, receiverId, message ,fileUrl, fileType, thumbnailUrl}) => {
         const room = [senderId, receiverId].sort().join('-');
 
         try {
             let savedMessage;
 
             if (fileUrl) {    
-                savedMessage = await directChatRepository.sendMessage(senderId, receiverId, `[${fileType}]${fileUrl}`, fileType);
+                savedMessage = await directChatRepository.sendMessage(senderId, receiverId, `[${fileType}]${fileUrl}`, fileType,thumbnailUrl);
             } else {
                 savedMessage = await directChatRepository.sendMessage(senderId, receiverId, message);
             }
