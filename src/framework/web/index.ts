@@ -17,16 +17,13 @@ const app = express()
 const server = createServer(app);
 const port = process.env.PORT || 3000
 
-// app.use(cors({
-//    origin: '*',
-//  }))
-
 
 
 const corsOptions = {
    origin: [process.env.CLIENT_URL as string, 'http://localhost:4200'],
    methods: 'GET,PUT,POST,PATCH,OPTIONS',
    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+   credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -52,5 +49,6 @@ setupSocket(server)
 setInterval(removeOldInvites, 24 * 60 * 60 * 1000);
 
 server.listen(port, () => {
-   console.log(`Example app listening on port ${port}!`)
+   console.log(`Example app listening on port ${port}!`),
+   console.log('Client URL:', process.env.CLIENT_URL);
 })
