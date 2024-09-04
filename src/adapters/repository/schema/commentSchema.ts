@@ -5,6 +5,7 @@ const commentSchema = new mongoose.Schema<IComment>({
     postId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
+        required: true
     },
     content: {
         type: String,

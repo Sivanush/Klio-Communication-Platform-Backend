@@ -165,4 +165,26 @@ export class PostRepository {
 
     }
 
+
+
+    async getComments(postId:string){
+        return await CommentModel.find({ postId: new mongoose.Types.ObjectId(postId) })
+        .populate({
+            path: 'author',  
+            select: 'username image'  
+        })
+        .sort({ timestamp: -1 }); 
+    }
+
+
+    async commentOnPost(postId:string,comment:string,userId:string){
+        const newComment = new CommentModel({
+            postId: new mongoose.Types.ObjectId(postId),
+            author: new mongoose.Types.ObjectId(userId),
+            content: comment
+        })
+
+        return await newComment.save()
+    }
+
 }

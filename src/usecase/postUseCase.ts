@@ -36,4 +36,22 @@ export class PostUseCase{
 
         return await this.postRepository.likeAndUnlikeComment(userId,postId)
     }
+
+
+    async executeGetCommentOnPost(postId:string){
+        if (!postId) throw new Error("Post Id is not provided try again");
+
+        return await this.postRepository.getComments(postId)
+    }
+
+
+    async executeCommentOnPost(postId:string,comment:string,userId:string){
+        if (!postId) throw new Error("Post Id is not provided try again");
+        if (!comment) throw new Error("Comment is not provided try again");
+        if (!userId) throw new Error("Unauthorized user try again");
+
+
+        return await this.postRepository.commentOnPost(postId,comment,userId)
+
+    }
 }

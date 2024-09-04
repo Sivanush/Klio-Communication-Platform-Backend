@@ -17,3 +17,5 @@ postRouter.post('/create-post',auth.authMiddleware,postController.createPost.bin
 postRouter.get('/user-post/:userId',auth.authMiddleware,postController.getUserPost.bind(postController))
 postRouter.get('/explore-post',auth.authMiddleware,postController.getExplorePost.bind(postController))
 postRouter.get('/like-post/:postId',auth.authMiddleware,postController.likeAndUnlikePost.bind(postController))
+postRouter.get('/comments/:postId',auth.authMiddleware,postController.getCommentOnPost.bind(postController))
+postRouter.post('/comment-post/:postId',auth.authMiddleware,postController.commentOnPost.bind(postController))

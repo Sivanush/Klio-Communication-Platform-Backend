@@ -16,7 +16,7 @@ export class PostController {
             const { content, type, mediaUrl } = req.body
             const userId = req.user?.userId
 
-            let post 
+            let post
             if (userId) {
                 if (mediaUrl) {
                     post = await this.postUseCase.executeCreatePost(content, type, userId, mediaUrl)
@@ -36,7 +36,7 @@ export class PostController {
 
     async getUserPost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const {userId} = req.params
+            const { userId } = req.params
 
             const posts = await this.postUseCase.executeGetUserPost(userId!)
 
@@ -62,16 +62,49 @@ export class PostController {
     async likeAndUnlikePost(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const userId = req.user?.userId
-            const {postId} = req.params
+            const { postId } = req.params
 
-            await this.postUseCase.executeLikeAndUnlikePost(userId!,postId)
+            await this.postUseCase.executeLikeAndUnlikePost(userId!, postId)
 
-            res.status(200).json({message:'Success'})
+            res.status(200).json({ message: 'Success' })
         } catch (err) {
             next(err)
         }
     }
 
+
+
+    async getCommentOnPost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const {postId} = req.params
+
+            const comments = await this.postUseCase.executeGetCommentOnPost(postId)
+
+            res.status(200).json({message:'Success',comments:comments})
+        } catch (err) {
+            next(err)
+        }
+    }
+
+
+    async commentOnPost(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const { postId } = req.params
+            const { comment } = req.body
+            const userId = req.user?.userId
+
+            if (userId) {
+                await this.postUseCase.executeCommentOnPost(postId, comment, userId)
+            } else {
+                res.status(401).json({ message: 'Unauthorized' })
+            }
+
+            res.status(201).json({ message: 'Success' })
+        } catch (err) {
+            next(err)
+        }
+    }
 }
 
 
