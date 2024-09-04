@@ -184,10 +184,7 @@ export class UserController {
         try {
             
             const {_id,username,bio,status,image,banner} = req.body
-
-            console.log(_id,username,bio,status,image,banner);
             
-
             const userData:User =  {_id,username,bio,status,image,banner}
 
             await this.userUseCase.executeUpdateProfile(userData)

@@ -1,5 +1,3 @@
-
-
 import express from 'express';
 import { PostRepository } from '../../../adapters/repository/postRepository';
 import { PostUseCase } from '../../../usecase/postUseCase';

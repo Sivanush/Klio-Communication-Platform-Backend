@@ -56,8 +56,13 @@ export class PostRepository {
 
     async getPostForExplorePage(userId: string) {
         return await postModel.aggregate([
-            { $match: { author: { $ne: new mongoose.Types.ObjectId(userId) } } },
-
+            { 
+                $match: { 
+                    author: { $ne: new mongoose.Types.ObjectId(userId) } 
+                } 
+            },
+    
+            // Lookup to get author info
             {
                 $lookup: {
                     from: 'users',
@@ -67,21 +72,60 @@ export class PostRepository {
                 }
             },
             { $unwind: '$authorInfo' },
-
+    
+            // Lookup to count likes for each post
             {
-                $addFields: {
-                    likeCount: { $size: '$likes' },
-                    commentCount: { $size: '$comments' }
+                $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'postId',
+                    as: 'likes'
                 }
             },
-
+    
+            // Lookup to count comments for each post
+            {
+                $lookup: {
+                    from: 'comments',
+                    localField: '_id',
+                    foreignField: 'postId',
+                    as: 'comments'
+                }
+            },
+    
+            // Lookup to check if the user has liked the post
+            {
+                $lookup: {
+                    from: 'likes',
+                    let: { postId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$$postId', '$postId'] },
+                                        { $eq: ['$user', new mongoose.Types.ObjectId(userId)] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'userLike'
+                }
+            },
+    
+            // Add fields for likeCount, commentCount, and isLiked
+            {
+                $addFields: {
+                    likeCount: { $size: '$likes' },           // Calculate the number of likes
+                    commentCount: { $size: '$comments' },     // Calculate the number of comments
+                    isLiked: { $gt: [{ $size: '$userLike' }, 0] }  // true if the user has liked the post
+                }
+            },
+    
             // Sort by engagement (you can adjust this based on your preferences)
             { $sort: { likeCount: -1, commentCount: -1, timestamp: -1 } },
-
-
-            //   { $skip: skip },
-            //   { $limit: limit },
-
+    
             // Project only the fields we need
             {
                 $project: {
@@ -91,6 +135,7 @@ export class PostRepository {
                     mediaType: 1,
                     likeCount: 1,
                     commentCount: 1,
+                    isLiked: 1,
                     timestamp: 1,
                     author: {
                         _id: '$authorInfo._id',
@@ -99,9 +144,9 @@ export class PostRepository {
                     }
                 }
             }
-
-        ])
+        ]);
     }
+    
 
 
     async likeAndUnlikeComment(userId: string, postId: string) {
