@@ -4,7 +4,7 @@ import cloudinary from '../../../utils/cloudinary';
 
 const directChatRepository = new DirectChatRepository();
 
-export const setupChatEvents = (io: Server, socket: Socket, onlineUsers: Map<string, any>) => {
+export const setupChatEvents = (io: Server, socket: Socket, onlineUsers: Map<string, {userId:string,socketId:string}>) => {
     socket.on('joinChat', ({ senderId, receiverId }) => {
         const room = [senderId, receiverId].sort().join('-');
         socket.join(room);
@@ -28,16 +28,22 @@ export const setupChatEvents = (io: Server, socket: Socket, onlineUsers: Map<str
             io.to(room).emit('message', updatedMessage);
 
             const unReadCount = await directChatRepository.getUnReadMessageCount(senderId, receiverId);
-            io.to(onlineUsers.get(receiverId)?.socketId).emit('unreadMessages', {
-                senderId,
-                count: unReadCount
-            });
+            const receiverSocketId = onlineUsers.get(receiverId)?.socketId;
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('unreadMessages', {
+                    senderId,
+                    count: unReadCount
+                });
+            }
 
             const unReadCountSender = await directChatRepository.getUnReadMessageCount(receiverId, senderId);
-            io.to(onlineUsers.get(senderId)?.socketId).emit('unreadMessages', {
-                senderId: receiverId,
-                count: unReadCountSender
-            });
+            const senderSocketId = onlineUsers.get(senderId)?.socketId;
+            if (senderSocketId) {
+                io.to(senderSocketId).emit('unreadMessages', {
+                    senderId: receiverId,
+                    count: unReadCountSender
+                });
+            }
         } catch (error) {
             console.error('Error in sendMessage:', error);
             socket.emit('messageError', { error: 'Failed to send message' });

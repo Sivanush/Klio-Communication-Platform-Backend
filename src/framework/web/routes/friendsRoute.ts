@@ -20,3 +20,4 @@ friendsRoute.get('/pending-request',auth.authMiddleware,friendsController.listPe
 friendsRoute.post('/accept-request',auth.authMiddleware,friendsController.acceptFriendRequest.bind(friendsController))  
 friendsRoute.post('/reject-request',auth.authMiddleware,friendsController.rejectFriendRequest.bind(friendsController))  
 friendsRoute.get('/all-friends',auth.authMiddleware,friendsController.getAllFriends.bind(friendsController))  
+friendsRoute.get('/get-random-users',auth.authMiddleware,friendsController.getRandomUsers.bind(friendsController))

@@ -15,11 +15,9 @@ export class FriendsUseCase{
         const updatedUsers = await Promise.all(users.map(async(user:SearchUser)=>{
             
             const friendShipStatus = await this.getFriendShipStatus(mainUser,user._id.toString())
-            console.log(friendShipStatus,'✅✅✅');
             
             return {...user,friendshipStatus:friendShipStatus}
         }))
-        console.log(updatedUsers);
         return updatedUsers
     }
 
@@ -111,5 +109,19 @@ export class FriendsUseCase{
 
     async executeGetAllFriends(userId:string){
         return await this.friendsRepository.getAllFriendsByUserId(userId)
+    }
+
+
+    async executeGetRandomUsers(userId:string){
+        if (!userId) throw new Error("Unauthorized user try again");
+
+        const users = await this.friendsRepository.getRandomUsers(userId)
+        const updatedUsers = await Promise.all(users.map(async(user:SearchUser)=>{
+            
+            const friendShipStatus = await this.getFriendShipStatus(userId,user._id.toString())
+            
+            return {...user,friendshipStatus:friendShipStatus}
+        }))
+        return updatedUsers
     }
 }

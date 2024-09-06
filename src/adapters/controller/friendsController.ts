@@ -137,4 +137,25 @@ export class FriendsController {
 
     }
 
+
+
+    async getRandomUsers(req: Request, res: Response, next: NextFunction){
+        try {
+            
+            const userId = req.user?.userId
+
+            if (userId) {
+                const users = await this.friendsUseCase.executeGetRandomUsers(userId)
+
+                res.status(200).json(users)
+            } else {
+                res.status(401).json({ message: 'Unauthorized' })
+            }
+
+
+        } catch (err) {
+            next(err)  
+        }
+    }
+
 }

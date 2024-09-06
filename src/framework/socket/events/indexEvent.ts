@@ -4,7 +4,7 @@ import { setupChannelEvents } from './channelEvents';
 import { setupUserEvents } from './userEvents';
 import { setupServerVideoCallEvents } from './serverVideoCallEvents';
 
-export const setupSocketEvents = (io: Server, socket: Socket, onlineUsers: Map<string, any>) => {
+export const setupSocketEvents = (io: Server, socket: Socket, onlineUsers: Map<string, {userId:string,socketId:string}>) => {
     setupChatEvents(io, socket, onlineUsers);
     setupChannelEvents(io, socket);
     setupUserEvents(io, socket, onlineUsers);
