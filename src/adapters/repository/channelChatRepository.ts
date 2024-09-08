@@ -9,16 +9,18 @@ export class ChannelChatRepository {
             .sort({ createdAt: -1 })
             .skip((page - 1) * pageSize)
             .limit(pageSize)
-            .select('sender message createdAt')
+            .select('sender message createdAt fileType thumbnailUrl')
             .populate('sender', 'username image')
             .lean();
     }
 
-    sendMessage(userId: string, channelId: string, message: string, fileType?:string) {
+    sendMessage(userId: string, channelId: string, message: string, fileType?:string, thumbnailUrl?:string) {
         const newMessage = new channelChatModel({
             sender: userId,
             channelId: channelId,
-            message: message
+            message: message,
+            fileType: fileType,
+            thumbnailUrl: thumbnailUrl
         });
         newMessage.save();
         return newMessage.populate('sender');

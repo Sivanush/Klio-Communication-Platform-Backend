@@ -6,7 +6,8 @@ interface ChannelChatI {
     channelId: ObjectId,
     message: string,
     fileType?: 'image' | 'video'|'text'
-    timestamp: Date;
+    timestamp: Date,
+    thumbnailUrl:string
 }
 
 const channelChatSchema = new mongoose.Schema<ChannelChatI>({
@@ -28,6 +29,9 @@ const channelChatSchema = new mongoose.Schema<ChannelChatI>({
         type: String,
         default:'text',
         enum: ['image', 'video', 'text'],
+    },
+    thumbnailUrl:{
+        type:String
     }
 }, {
     timestamps: true
