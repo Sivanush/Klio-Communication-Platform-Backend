@@ -42,7 +42,7 @@ const userSchema = new Schema<userI>({
     },
     banner:{
         type:String,
-        default:'https://discord-bucket-7.s3.ap-south-1.amazonaws.com/jn8jyih8obj71.webp',
+        default:'https://res.cloudinary.com/dgpcd5c0d/image/upload/v1731437459/CMD/nh83k1roaiczbnkgrgfv.webp',
     },
     isBlocked:{
         type:Boolean,
