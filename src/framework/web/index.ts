@@ -20,7 +20,7 @@ const port = process.env.PORT || 3000
 
 
 const corsOptions = {
-   origin: [process.env.CLIENT_URL as string, 'http://localhost:4200'],
+   origin: '*',
    methods: 'GET,PUT,POST,PATCH,OPTIONS',
    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
    credentials: true,
